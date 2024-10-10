@@ -11,7 +11,7 @@ class DoorController extends Controller
     {
 
         return response()->json([
-            'status'=> $status
+            'status'=> 1
         ], 200);
     }
 }
