@@ -9,9 +9,15 @@ class DoorController extends Controller
 {
     public function door($id)
     {
+        if ($id == 1) {
+            return response()->json([
+                'status' => true
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false
+            ], 200);
+        }
 
-        return response()->json([
-            'status'=> 1
-        ], 200);
     }
 }
