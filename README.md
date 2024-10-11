@@ -2,12 +2,12 @@
 
 Дернуть api:
     ```bash
-    http://skud.uuum19xb.beget.tech/api/door/{id}
+    http://skud.uuum19xb.beget.tech/api/door/{id}/{door_id}
     ```
 
 <h1>План</h1>
 <h2>v0 (Готов сервак)</h2> 
-<li>Настроить базу данных с фабриками</li>
+<li>Настроить базу данных с фабрикамвфи</li>
 <li>Сделать работающий API</li>
 <h2>v1 (Основная часть сайта)</h2>
 <li>Админку с круд
