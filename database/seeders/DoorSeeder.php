@@ -13,9 +13,6 @@ class DoorSeeder extends Seeder
      */
     public function run(): void
     {
-        Door::factory()->create([
-            'level' => 3,
-            'number' => rand(1, 500)
-        ]);
+        Door::factory()->count(10)->create();
     }
 }

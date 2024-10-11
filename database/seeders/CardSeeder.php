@@ -13,8 +13,6 @@ class CardSeeder extends Seeder
      */
     public function run(): void
     {
-        Card::factory()->create([
-            'level' => 5,
-        ]);
+        Card::factory()->create();
     }
 }

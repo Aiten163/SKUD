@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class DoorController extends Controller
 {
-    public function door($id)
+    public function door($id, $room_id)
     {
         if ($id == 1) {
             return response()->json([

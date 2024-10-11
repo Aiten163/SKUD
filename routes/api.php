@@ -8,4 +8,4 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/door/{id}', [doorcontroller::class, 'door'])->name('door');
+Route::get('/door/{id}/{room_id}', [doorcontroller::class, 'door'])->name('door');
