@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('doors', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('number')->nullable();
-            $table->unsignedInteger('build')->nullable()->unique();
+            $table->unsignedInteger('build')->nullable();
             $table->unsignedInteger('owner')->nullable();
             $table->tinyInteger('level')->nullable();
         });
