@@ -12,7 +12,7 @@ class DoorController extends Controller
     public function door($id, $room_id)
     {
         $Card = Card::where('id', $id)->get();
-        $Door = Door::where('room_id', $room_id)->get();
+        $Door = Door::where('id', $room_id)->get();
 
         if ($id) {
             return response()->json([
