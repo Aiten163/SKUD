@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Door extends Model
 {
@@ -18,4 +19,8 @@ class Door extends Model
             'owner',
             'number'
         ];
+    public function lock(): HasOne
+    {
+        return $this->hasOne(Lock::class);
+    }
 }
