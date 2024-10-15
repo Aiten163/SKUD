@@ -2,18 +2,17 @@
 
 <h2 style=color:orange ><i>API</i></h2>
 <h3> Главный (пока доработки) </h3>
-    ```
-    http://skud.uuum19xb.beget.tech/api/door/{id}/{door_id}
-    ```
+
+http://skud.uuum19xb.beget.tech/api/door/{id}/{door_id}
 
 <h3> Для теста </h3>
 
-   http://skud.uuum19xb.beget.tech/api/door/test/{action}/{lockId}/{card_id} 
+http://skud.uuum19xb.beget.tech/api/door/test/{action}/{lockId}/{card_id}
   <p>{action} = lock | unlock</p>
 <h3> Получить всю таблицу </h3>
-   <a> http://skud.uuum19xb.beget.tech/api/door/getDoors </a>
-   <a> http://skud.uuum19xb.beget.tech/api/door/getCards </a>
-   <a> http://skud.uuum19xb.beget.tech/api/door/getLocks </a>
+    <p> http://skud.uuum19xb.beget.tech/api/door/getDoors </p> 
+    <p> http://skud.uuum19xb.beget.tech/api/door/getCards </p> 
+    <p> http://skud.uuum19xb.beget.tech/api/door/getLocks  </p> 
 <h3> Связать дверь и замок </h3>
    <a> http://skud.uuum19xb.beget.tech/api/door/link/{lock_id}/{card_id}' </a>
 
