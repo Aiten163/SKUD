@@ -29,11 +29,11 @@ class DoorController extends Controller
 
     }
 
-    public function test($action, $lock_id, $card_id)
+    public function test($action, $lock_id, $sha)
     {
         try {
-            $card = Card::find($card_id);
-            $lock = Lock::find($lock_id);
+            $card = Card::find($lock_id); //Card::class->firstWhere('sha', $sha);
+            $lock = Lock::class->find($lock_id);
             $door = $lock->door;
         } catch (ModelNotFoundException $e) {
             return response()->json([
