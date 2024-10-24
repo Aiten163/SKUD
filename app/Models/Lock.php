@@ -10,6 +10,10 @@ class Lock extends Model
 {
     use HasFactory;
     protected $fillable = ['door_id'];
+    protected $allowedFilters=[
+        'door_id'=> Where::class,
+        'id'=> Where::class
+    ];
     public $timestamps = false;
     public function door(): BelongsTo
     {
