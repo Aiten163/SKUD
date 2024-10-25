@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f6fb4362b1aa2fa3ec908ab42ace8ed",
+    "content-hash": "ee7afc2bdfbeb09d86df59536b6d6199",
     "packages": [
         {
             "name": "brick/math",
@@ -2530,16 +2530,16 @@
         },
         {
             "name": "orchid/platform",
-            "version": "14.38.0",
+            "version": "14.39.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchidsoftware/platform.git",
-                "reference": "cc8897943fdea2f404e04783582dd0c1edaa0c25"
+                "reference": "f0cefc56d62b3244d702208a6cd1e4f876279756"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchidsoftware/platform/zipball/cc8897943fdea2f404e04783582dd0c1edaa0c25",
-                "reference": "cc8897943fdea2f404e04783582dd0c1edaa0c25",
+                "url": "https://api.github.com/repos/orchidsoftware/platform/zipball/f0cefc56d62b3244d702208a6cd1e4f876279756",
+                "reference": "f0cefc56d62b3244d702208a6cd1e4f876279756",
                 "shasum": ""
             },
             "require": {
@@ -2632,7 +2632,7 @@
                     "type": "opencollective"
                 }
             ],
-            "time": "2024-10-23T15:45:48+00:00"
+            "time": "2024-10-24T14:59:33+00:00"
         },
         {
             "name": "phpoption/phpoption",

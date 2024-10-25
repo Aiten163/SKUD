@@ -40,7 +40,10 @@ class DoorController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
-
+        return response()->json([
+            'card' => $card->level,
+            'door' => $door->d
+        ]);
         $responce = $card->level > $door->level;
 
         if (!empty($responce)) {
@@ -49,7 +52,7 @@ class DoorController extends Controller
                     $door->update(['owner' => null]);
                     break;
                 case 'unlock':
-                    $door->update(['owner' => $card_id]);
+                    $door->update(['owner' => $card->id]);
                     break;
                 default:
                     $error = 'Dont know action';
