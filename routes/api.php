@@ -15,7 +15,7 @@ Route::controller(DoorController::class)->group(function () {
     Route::get('/door/test_no_validate/{action}/{lock_id}/{card_id}', 'test_no_validate')->name('test_no_validate');
 
 
-    Route::put('/door/link/{lock_id}/{card_id}', 'linkLockWithDoor')->name('LinkLockWithDoor');
+    Route::get('/door/link/{lock_id}/{card_id}', 'linkLockWithDoor')->name('LinkLockWithDoor');
 
     Route::get('/door/getDoors', 'getDoors')->name('getDoors');
     Route::get('/door/getLocks', 'getLocks')->name('getLocks');

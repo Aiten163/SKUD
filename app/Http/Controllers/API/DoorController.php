@@ -32,18 +32,14 @@ class DoorController extends Controller
     public function test($action, $lock_id, $sha)
     {
         try {
-            $card = Card::find($lock_id); //Card::class->firstWhere('sha', $sha);
-            $lock = Lock::class->find($lock_id);
+            $card = Card::firstwhere('id', 2); //Card::class->firstWhere('sha', $sha);
+            $lock = Lock::firstwhere('id',$lock_id);
             $door = $lock->door;
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => $e->getMessage()
             ]);
         }
-        return response()->json([
-            'card' => $card->level,
-            'door' => $door->d
-        ]);
         $responce = $card->level > $door->level;
 
         if (!empty($responce)) {
