@@ -40,7 +40,7 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route(config('platform.index')),
 
             Menu::make('Двери')
-                ->icon('bs.login')
+                ->icon('bs.door-closed')
                 ->route('platform.doors'),
             Menu::make('Замки')
                 ->icon('bs.lock')
