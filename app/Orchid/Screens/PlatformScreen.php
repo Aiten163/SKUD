@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Orchid\Screens;
 
+use App\Models\Add_lock;
+use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
 
@@ -32,7 +35,7 @@ class PlatformScreen extends Screen
      */
     public function description(): ?string
     {
-        return 'Welcome to your Orchid application.';
+        return '';
     }
 
     /**
@@ -42,7 +45,18 @@ class PlatformScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        return [];
+        $add_lock = Add_lock::first();
+        if(empty($add_lock->status))
+        {
+            return [
+                Button::make('Режим привязки выключен')->method('change_add_lock' )->style('color:red; font-size:19px'),
+            ];
+        } else {
+            return [
+                Button::make('Режим привязки включен')->method('change_add_lock')->style('color:green; font-size:19px'),
+            ];
+        }
+
     }
 
     /**
@@ -53,8 +67,13 @@ class PlatformScreen extends Screen
     public function layout(): iterable
     {
         return [
-            Layout::view('platform::partials.update-assets'),
-            Layout::view('platform::partials.welcome'),
+
         ];
+    }
+    public function change_add_lock()
+    {
+        $add_lock = Add_lock::first();
+        $add_lock->status = !$add_lock->status;
+        $add_lock->save();
     }
 }
