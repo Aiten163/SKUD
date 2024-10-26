@@ -19,6 +19,6 @@ class StartSeeder extends Seeder
         Card::factory()->count(10)->create();
         Door::factory()->count(10)->create();
         Lock::factory()->count(10)->create();
-        Add_lock::class->create();
+        Add_lock::create();
     }
 }

@@ -18,9 +18,9 @@ class DoorController extends Controller
         $action = $request->query('action');
         $lockId = $request->query('lock_id');
         $cardId = $request->query('card_id');
-        if(Add_lock::class->first()->status and !Lock::class->find($lockId))
+        if(Add_lock::first()->status and !Lock::find($lockId))
         {
-            Lock::class->create(['id'=> $lockId]);
+            Lock::create(['id'=> $lockId]);
             return response()->json(['code' => 3]);
         }
 
@@ -70,7 +70,7 @@ class DoorController extends Controller
 
     public function add_lock()
     {
-        $add_lock = Add_lock::class->first();
+        $add_lock = Add_lock::first();
         $add_lock->status = !$add_lock->status;
         $add_lock->save();
         return response()->json(['status' => $add_lock->status]);

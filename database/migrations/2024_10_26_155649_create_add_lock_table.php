@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('add_lock', function (Blueprint $table) {
+        Schema::create('add_locks', function (Blueprint $table) {
             $table->id();
             $table->boolean('status')->default(false);
             $table->timestamps();
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('add_lock');
+        Schema::dropIfExists('add_locks');
     }
 };

@@ -12,7 +12,7 @@ Route::controller(DoorController::class)->group(function () {
 
     Route::get('/door', 'door')->name('door');
 
-    Route::get('/door/add_lock', 'add_lock')->name('add_lock');
+    Route::get('/add_lock', 'add_lock')->name('add_lock');
 
     Route::get('/door/test_no_validate/{action}/{lock_id}/{card_id}', 'test_no_validate')->name('test_no_validate');
 
