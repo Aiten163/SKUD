@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Orchid\Filters\Filterable;
+use Orchid\Filters\Types\Where;
+use Orchid\Screen\AsMultiSource;
 
 /**
  *
@@ -23,6 +26,9 @@ use Illuminate\Database\Eloquent\Model;
 class Card extends Model
 {
     use HasFactory;
+    use Filterable;
+    use AsMultiSource;
+
     public $timestamps = false;
     protected $fillable =
         [
@@ -31,4 +37,10 @@ class Card extends Model
             'uid',
             'msru_id'
         ];
+    protected $allowedFilters=[
+        'id'=> Where::class,
+        'level'=> Where::class,
+        'uid'=> Where::class,
+        'msru_id'=> Where::class,
+    ];
 }

@@ -35,7 +35,11 @@ class Lock extends Model
     protected $fillable = ['id','door_id'];
     protected $allowedFilters=[
         'door_id'=> Where::class,
-        'id'=> Where::class
+        'id'=> Where::class,
+        'room'=> Where::class,
+        'level'=> Where::class,
+        'building'=> Where::class,
+        'owner'=> Where::class,
     ];
     public $timestamps = false;
     public function door(): BelongsTo

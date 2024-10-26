@@ -2,9 +2,9 @@
 
 namespace App\Orchid\Screens;
 
-use App\Models\Door;
-use App\Models\Lock;
-use App\Orchid\Layouts\Lock\LocksTable;
+use App\Models\Card;
+use App\Orchid\Layouts\Card\CardsTable;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Orchid\Screen\Fields\Select;
@@ -15,7 +15,7 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast as FacadesToast;
 
-class LocksScreen extends Screen
+class CardsScreen extends Screen
 {
     /**
      * Fetch data to be displayed on the screen.
@@ -25,7 +25,7 @@ class LocksScreen extends Screen
     public function query(): iterable
     {
         return [
-            'locks'=>Lock::filters()->defaultSort('id')->paginate()
+            'cards'=>Card::filters()->defaultSort('id')->paginate()
         ];
     }
 
@@ -36,7 +36,7 @@ class LocksScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Замки';
+        return 'Карточки';
     }
 
     /**
@@ -47,7 +47,7 @@ class LocksScreen extends Screen
     public function commandBar(): array
     {
         return [
-            ModalToggle::make("Добавить замок")->modal('createlock')->method('create'),
+            ModalToggle::make("Добавить карточку")->modal('createcard')->method('create'),
         ];
     }
 
@@ -60,43 +60,46 @@ class LocksScreen extends Screen
     {
         return
             [
-                LocksTable::class,
-                Layout::modal('createlock', Layout::rows([
-                    Input::make('door_id')->required()->title('ID двери'),
-                ]))->title("Добавить замок")->applyButton('Добавить'),
+                CardsTable::class,
+                Layout::modal('createcard', Layout::rows([
+                    Input::make('level')->title('Уровень'),
+                    Input::make('mrsu_id')->title('ID mrsu'),
+                    Input::make('uid')->title('Шифр'),
+                ]))->title("Добавить карточку")->applyButton('Добавить'),
 
-                Layout::modal("editlock", Layout::rows
+                Layout::modal("editcard", Layout::rows
                 (
                     [
-                        Input::make('lock.id')->type('hidden'),
-                        Input::make('lock.door_id')->title("ID двери"),
+                        Input::make('card.id')->type('hidden'),
+                        Input::make('card.level')->title('Уровень'),
+                        Input::make('card.mrsu_id')->title('ID mrsu'),
+                        Input::make('card.uid')->title('Шифр'),
                     ]
-                ))->async('asyncGetLock')
+                ))->async('asyncGetCard')
             ];
     }
-    public function asyncGetLock(lock $lock): array
+    public function asyncGetCard(card $card): array
     {
         return[
-            'lock' => $lock
+            'card' => $card
         ];
     }
     public function update(Request $request)
     {
-        lock::find($request->input('lock.id'))->update($request->lock);
+        card::find($request->input('card.id'))->update($request->card);
         Toast::info('Успешно обновлено');
     }
     public function delete(Request $request)
     {
-        lock::find($request->lock)->delete();
+        card::find($request->card)->delete();
         Toast::info('Успешно удалено');
     }
 
 
     public function create(Request $request): void
     {
-
-        door::create($request->merge([
+        card::create($request->merge([
         ])->except('_token'));
-        FacadesToast::info('Замок успешно добавлен');
+        FacadesToast::info('Карточка успешно добавлена');
     }
 }
