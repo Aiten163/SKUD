@@ -33,25 +33,25 @@ class LocksTable extends Table
             TD::make('room', 'Номер комнаты')->filter()
                 ->render(function ($lock)
                 {
-                    return $lock->door->room;
+                    return $lock->door->room?  $lock->door->room? : null ;
                 }
                 ),
             TD::make('building', 'Корпус')->filter()
                 ->render(function ($lock)
                 {
-                    return $lock->door->building;
+                    return $lock->door->building?  $lock->door->building? : null ;
                 }
                 ),
             TD::make('owner', 'Владелец')->filter()
                 ->render(function ($lock)
                 {
-                    return $lock->door->owner;
+                    return $lock->door->owner?  $lock->door->owner? : null ;
                 }
                 ),
             TD::make('level', 'Уровень')->filter()
                 ->render(function ($lock)
                 {
-                    return $lock->door->level;
+                    return $lock->door->level?  $lock->door->level? : null ;
                 }
                 ),
             TD::make('action', '')->cantHide()->render(function (Lock $Lock)
