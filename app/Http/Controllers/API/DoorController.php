@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Add_lock;
 use App\Models\Card;
 use App\Models\Door;
 use App\Models\Lock;
@@ -11,46 +12,42 @@ use Illuminate\Http\Request;
 
 class DoorController extends Controller
 {
-    public function door($id, $room_id)
-    {
-        $card = Card::where('id', $id)->get();
-        $door = Door::where('id', $room_id)->get();
 
-        if ($id) {
-            return response()->json([
-                'status' => $card,
-                'door' => $door
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => false
-            ], 200);
-        }
-
-    }
-
-    public function test(Request $request)
+    public function door(Request $request)
     {
         $action = $request->query('action');
         $lockId = $request->query('lock_id');
         $cardId = $request->query('card_id');
-        if (!in_array($action, ['unlock', 'lock'])) {
-            return response()->json(['error' => 'Invalid action specified'], 400);
-        }
-        if (!$lockId || !$cardId) {
-            return response()->json(['error' => 'Missing lock_id or card_id'], 400);
+        if(Add_lock::class->first()->status and !Lock::class->find($lockId))
+        {
+            Lock::class->create(['id'=> $lockId]);
+            return response()->json(['code' => 3]);
         }
 
+        if (!$lockId || !$cardId) {
+            return response()->json([
+                'code' => 0,
+                'error' => 'Missing lock_id or card_id'
+            ], 400);
+        }
+
+        if (!in_array($action, ['unlock', 'lock'])) {
+            return response()->json([
+                'code' => 0,
+                'error' => 'Invalid action'
+            ], 400);
+        }
         try {
             $card = Card::firstwhere('uid', $cardId);
             $lock = Lock::firstwhere('id',$lockId);
             $door = $lock->door;
         } catch (ModelNotFoundException $e) {
             return response()->json([
+                'code' => 0,
                 'error' => $e->getMessage()
             ]);
         }
-        $responce = $card->level > $door->level;
+        $responce = $card->level >= $door->level;
 
         if (!empty($responce)) {
             switch ($action) {
@@ -66,14 +63,17 @@ class DoorController extends Controller
             }
         }
         return response()->json([
-            'response' => $responce,
+            'code' => $responce? 1:2,
             'error' => $error ?? null
         ]);
     }
 
-    public function test_no_validate($action, $lock_id, $card_id)
+    public function add_lock()
     {
-
+        $add_lock = Add_lock::class->first();
+        $add_lock->status = !$add_lock->status;
+        $add_lock->save();
+        return response()->json(['status' => $add_lock->status]);
     }
 
     public function linkLockWithDoor($lock_id, $door_id)
