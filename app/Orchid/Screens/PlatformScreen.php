@@ -49,11 +49,17 @@ class PlatformScreen extends Screen
         if(empty($add_lock->status))
         {
             return [
-                Button::make('Режим привязки выключен')->method('change_add_lock' )->style('color:red; font-size:19px'),
+                Button::make('Режим привязки выключен')
+                    ->method('change_add_lock' )
+                    ->style('color:red; font-size:19px')
+                ->icon('lock'),
             ];
         } else {
             return [
-                Button::make('Режим привязки включен')->method('change_add_lock')->style('color:green; font-size:19px'),
+                Button::make('Режим привязки включен')
+                    ->method('change_add_lock')
+                    ->style('color:green; font-size:19px')
+                    ->icon('unlock'),
             ];
         }
 
