@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('doors', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('number')->nullable();
-            $table->unsignedInteger('build')->nullable();
+            $table->unsignedInteger('room')->nullable();
+            $table->unsignedInteger('building')->nullable();
             $table->unsignedInteger('owner')->nullable();
             $table->tinyInteger('level')->nullable();
         });

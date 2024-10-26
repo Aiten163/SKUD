@@ -29,11 +29,21 @@ class DoorController extends Controller
 
     }
 
-    public function test($action, $lock_id, $sha)
+    public function test(Request $request)
     {
+        $action = $request->query('action');
+        $lockId = $request->query('lock_id');
+        $cardId = $request->query('card_id');
+        if (!in_array($action, ['unlock', 'lock'])) {
+            return response()->json(['error' => 'Invalid action specified'], 400);
+        }
+        if (!$lockId || !$cardId) {
+            return response()->json(['error' => 'Missing lock_id or card_id'], 400);
+        }
+
         try {
-            $card = Card::firstwhere('id', 2); //Card::class->firstWhere('sha', $sha);
-            $lock = Lock::firstwhere('id',$lock_id);
+            $card = Card::firstwhere('uid', $cardId);
+            $lock = Lock::firstwhere('id',$lockId);
             $door = $lock->door;
         } catch (ModelNotFoundException $e) {
             return response()->json([

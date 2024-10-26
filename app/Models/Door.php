@@ -10,7 +10,7 @@ use Orchid\Filters\Types\Where;
 use Orchid\Screen\AsMultiSource;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $number
@@ -43,18 +43,18 @@ class Door extends Model
         [
             'id',
             'level',
-            'build',
+            'building',
             'owner',
-            'number'
+            'room'
         ];
     protected $allowedFilters=[
         'level'=> Where::class,
         'id'=> Where::class,
-        'build'=> Where::class,
-        'number'=> Where::class,
+        'building'=> Where::class,
+        'room'=> Where::class,
         'owner'=> Where::class
     ];
-    public function lock(): HasOne
+    public function doorLock(): HasOne
     {
         return $this->hasOne(Lock::class);
     }

@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
             $table->unsignedTinyInteger('level')->nullable();
-            $table->string('sha', 256)->nullable();
+            $table->unsignedInteger('mrsu_id')->nullable();
+            $table->string('uid', 64)->nullable();
         });
     }
 
