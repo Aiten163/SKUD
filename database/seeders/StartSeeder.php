@@ -16,9 +16,9 @@ class StartSeeder extends Seeder
      */
     public function run(): void
     {
-        Card::factory()->count(10)->create();
-        Door::factory()->count(10)->create();
-        Lock::factory()->count(10)->create();
-        Add_lock::create();
+        CardSeeder::run();
+        DoorSeeder::run();
+        LockSeeder::run();
+        Add_lockSeeder::run();
     }
 }

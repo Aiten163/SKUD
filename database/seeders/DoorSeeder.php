@@ -11,7 +11,7 @@ class DoorSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public static function run(): void
     {
         Door::factory()->count(10)->create();
     }

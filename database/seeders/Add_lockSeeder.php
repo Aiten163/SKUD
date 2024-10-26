@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Card;
+use App\Models\Add_lock;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class CardSeeder extends Seeder
+class Add_lockSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public static function run(): void
     {
-        Card::factory()->count(10)->create();
+        Add_lock::create();
     }
 }

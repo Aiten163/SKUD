@@ -38,8 +38,8 @@ class DoorController extends Controller
             ], 400);
         }
         try {
-            $card = Card::firstwhere('uid', $cardId);
-            $lock = Lock::firstwhere('id',$lockId);
+            $card = Card::where('uid', $cardId)->firstOrFail();
+            $lock = Lock::findOrFail($lockId);
             $door = $lock->door;
         } catch (ModelNotFoundException $e) {
             return response()->json([

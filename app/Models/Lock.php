@@ -10,7 +10,7 @@ use Orchid\Filters\Types\Where;
 use Orchid\Screen\AsMultiSource;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $door_id
@@ -32,7 +32,7 @@ class Lock extends Model
     use HasFactory;
     use Filterable;
     use AsMultiSource;
-    protected $fillable = ['door_id'];
+    protected $fillable = ['id','door_id'];
     protected $allowedFilters=[
         'door_id'=> Where::class,
         'id'=> Where::class

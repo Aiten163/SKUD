@@ -11,8 +11,12 @@ class LockSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public static function run(): void
     {
-        Lock::factory()->count(10)->create();
+        $n = Lock::count()+1;
+        for($i=$n; $i<$n+10; $i++)
+        {
+            Lock::create(['door_id'=>$i, 'id'=>$i]);
+        }
     }
 }

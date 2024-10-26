@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('locks', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary()->unique();
             $table->foreignId('door_id')->nullable()->constrained('doors');
         });
     }
