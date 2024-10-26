@@ -18,9 +18,8 @@ class DoorController extends Controller
         $action = $request->query('action');
         $lockId = $request->query('lock_id');
         $cardId = $request->query('card_id');
-        if(Add_lock::first()->status and !Lock::find($lockId))
-        {
-            Lock::create(['id'=> $lockId]);
+        if (Add_lock::first()->status and !Lock::find($lockId)) {
+            Lock::create(['id' => $lockId]);
             return response()->json(['code' => 3]);
         }
 
@@ -37,14 +36,19 @@ class DoorController extends Controller
                 'error' => 'Invalid action'
             ], 400);
         }
-        try {
-            $card = Card::where('uid', $cardId)->firstOrFail();
-            $lock = Lock::findOrFail($lockId);
-            $door = $lock->door;
-        } catch (ModelNotFoundException $e) {
+
+        $card = Card::where('uid', $cardId)->firstOrFail();
+        $lock = Lock::find($lockId);
+        $door = $lock->door;
+        if (empty($card)) {
+            return response()->json([
+                'code' => 2,
+            ]);
+        }
+        if (empty($lock)) {
             return response()->json([
                 'code' => 0,
-                'error' => $e->getMessage()
+                'error' => 'lock not found'
             ]);
         }
         $responce = $card->level >= $door->level;
@@ -52,6 +56,10 @@ class DoorController extends Controller
         if (!empty($responce)) {
             switch ($action) {
                 case 'lock':
+                    $level = Card::find($door->owner)->level;
+                    if ($level >= $card->level and $card->id != $door->owner) {
+                        return response()->json(['code' => 2]);
+                    }
                     $door->update(['owner' => null]);
                     break;
                 case 'unlock':
@@ -63,7 +71,7 @@ class DoorController extends Controller
             }
         }
         return response()->json([
-            'code' => $responce? 1:2,
+            'code' => $responce ? 1 : 2,
             'error' => $error ?? null
         ]);
     }
