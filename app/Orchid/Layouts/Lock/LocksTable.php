@@ -8,6 +8,7 @@ use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\ModalToggle;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
+
 class LocksTable extends Table
 {
     /**
@@ -31,48 +32,58 @@ class LocksTable extends Table
             TD::make('id', 'ID')->sort()->filter(TD::FILTER_NUMERIC),
             TD::make('door_id', 'ID двери')->sort()->filter(),
             TD::make('room', 'Номер комнаты')->filter()
-                ->render(function ($lock)
-                {
-                    return $lock->door->room?  $lock->door->room? : null ;
+                ->render(function ($lock) {
+                    if (empty($lock->door->room)) {
+                        return;
+                    } else {
+                        return $lock->door->room;
+                    }
                 }
                 ),
             TD::make('building', 'Корпус')->filter()
-                ->render(function ($lock)
-                {
-                    return $lock->door->building?  $lock->door->building? : null ;
+                ->render(function ($lock) {
+                    if (empty($lock->door->building)) {
+                        return;
+                    } else {
+                        return $lock->door->building;
+                    }
                 }
                 ),
             TD::make('owner', 'Владелец')->filter()
-                ->render(function ($lock)
-                {
-                    return $lock->door->owner?  $lock->door->owner? : null ;
+                ->render(function ($lock) {
+                    if (empty($lock->door->owner)) {
+                        return;
+                    } else {
+                        return $lock->door->owner;
+                    }
                 }
                 ),
             TD::make('level', 'Уровень')->filter()
-                ->render(function ($lock)
-                {
-                    return $lock->door->level?  $lock->door->level? : null ;
+                ->render(function ($lock) {
+                    if (empty($lock->door->level)) {
+                        return;
+                    } else {
+                        return $lock->door->level;
+                    }
                 }
                 ),
-            TD::make('action', '')->cantHide()->render(function (Lock $Lock)
-            {
+            TD::make('action', '')->cantHide()->render(function (Lock $Lock) {
                 return ModalToggle::make("")
                     ->modal('editlock')
                     ->icon('pen')
                     ->method('update')
-                    ->modalTitle('Редактирование замка '.$Lock->id)
+                    ->modalTitle('Редактирование замка ' . $Lock->id)
                     ->asyncParameters([
-                            'lock' =>$Lock->id
+                            'lock' => $Lock->id
                         ]
                     );
             }),
-            TD::make('action','')->cantHide()
-                ->render(function (Lock $Lock)
-                {
+            TD::make('action', '')->cantHide()
+                ->render(function (Lock $Lock) {
                     return Button::make("")
                         ->icon('trash')
-                        ->method('delete',[
-                            'lock'=>$Lock->id
+                        ->method('delete', [
+                            'lock' => $Lock->id
                         ]);
                 })
         ];
