@@ -63,7 +63,7 @@ class CardsScreen extends Screen
                 CardsTable::class,
                 Layout::modal('createcard', Layout::rows([
                     Input::make('level')->title('Уровень'),
-                    Input::make('mrsu_id')->title('ID mrsu'),
+                    Input::make('mrsu_id')->title('ID ЭИОС'),
                     Input::make('uid')->title('Шифр'),
                 ]))->title("Добавить карточку")->applyButton('Добавить'),
 
@@ -72,7 +72,7 @@ class CardsScreen extends Screen
                     [
                         Input::make('card.id')->type('hidden'),
                         Input::make('card.level')->title('Уровень'),
-                        Input::make('card.mrsu_id')->title('ID mrsu'),
+                        Input::make('card.mrsu_id')->title('ID ЭИОС'),
                         Input::make('card.uid')->title('Шифр'),
                     ]
                 ))->async('asyncGetCard')

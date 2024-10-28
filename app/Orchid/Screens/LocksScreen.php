@@ -2,11 +2,13 @@
 
 namespace App\Orchid\Screens;
 
+use App\Models\Add_lock;
 use App\Models\Door;
 use App\Models\Lock;
 use App\Orchid\Layouts\Lock\LocksTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Select;
 use \Orchid\Support\Facades\Toast;
 use Orchid\Screen\Actions\ModalToggle;
@@ -46,9 +48,23 @@ class LocksScreen extends Screen
      */
     public function commandBar(): array
     {
-        return [
-            ModalToggle::make("Добавить замок")->modal('createlock')->method('create'),
-        ];
+        $add_lock = Add_lock::first();
+        if(empty($add_lock->status))
+        {
+            return [
+                Button::make('Режим привязки выключен')
+                    ->method('change_add_lock' )
+                    ->style('color:red; font-size:19px')
+                    ->icon('lock'),
+            ];
+        } else {
+            return [
+                Button::make('Режим привязки включен')
+                    ->method('change_add_lock')
+                    ->style('color:green; font-size:19px')
+                    ->icon('unlock'),
+            ];
+        }
     }
 
     /**
@@ -98,5 +114,12 @@ class LocksScreen extends Screen
         door::create($request->merge([
         ])->except('_token'));
         FacadesToast::info('Замок успешно добавлен');
+    }
+
+    public function change_add_lock()
+    {
+        $add_lock = Add_lock::first();
+        $add_lock->status = !$add_lock->status;
+        $add_lock->save();
     }
 }
