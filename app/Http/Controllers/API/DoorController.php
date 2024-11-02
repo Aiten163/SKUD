@@ -25,15 +25,13 @@ class DoorController extends Controller
 
         if (!$lockId || !$cardId) {
             return response()->json([
-                'code' => 0,
-                'error' => 'Missing lock_id or card_id'
+                'code' => 0
             ], 400);
         }
 
         if (!in_array($action, ['unlock', 'lock'])) {
             return response()->json([
-                'code' => 0,
-                'error' => 'Invalid action'
+                'code' => 0
             ], 400);
         }
 
@@ -42,13 +40,12 @@ class DoorController extends Controller
         $door = $lock->door;
         if (empty($card)) {
             return response()->json([
-                'code' => 2,
+                'code' => 2
             ]);
         }
         if (empty($lock)) {
             return response()->json([
-                'code' => 0,
-                'error' => 'lock not found'
+                'code' => 0
             ]);
         }
         $responce = $card->level >= $door->level;
@@ -56,8 +53,8 @@ class DoorController extends Controller
         if (!empty($responce)) {
             switch ($action) {
                 case 'lock':
-                    $level = Card::find($door->owner)->level;
-                    if ($level >= $card->level and $card->id != $door->owner) {
+                    $level = Card::find($door->owner)->level; // level владельца
+                    if ($level > $card->level and $card->id != $door->owner) {
                         return response()->json(['code' => 2]);
                     }
                     $door->update(['owner' => null]);
@@ -71,8 +68,7 @@ class DoorController extends Controller
             }
         }
         return response()->json([
-            'code' => $responce ? 1 : 2,
-            'error' => $error ?? null
+            'code' => $responce ? 1 : 2
         ]);
     }
 
