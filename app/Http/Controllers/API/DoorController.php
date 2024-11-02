@@ -7,69 +7,21 @@ use App\Models\Add_lock;
 use App\Models\Card;
 use App\Models\Door;
 use App\Models\Lock;
+use App\Services\DoorActionService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class DoorController extends Controller
 {
-
     public function door(Request $request)
     {
         $action = $request->query('action');
         $lockId = $request->query('lock_id');
         $cardId = $request->query('card_id');
-        if (Add_lock::first()->status and !Lock::find($lockId)) {
-            Lock::create(['id' => $lockId]);
-            return response()->json(['code' => 3]);
-        }
-
-        if (!$lockId || !$cardId) {
-            return response()->json([
-                'code' => 0
-            ], 400);
-        }
-
-        if (!in_array($action, ['unlock', 'lock'])) {
-            return response()->json([
-                'code' => 0
-            ], 400);
-        }
-
-        $card = Card::where('uid', $cardId)->firstOrFail();
-        $lock = Lock::find($lockId);
-        $door = $lock->door;
-        if (empty($card)) {
-            return response()->json([
-                'code' => 2
-            ]);
-        }
-        if (empty($lock)) {
-            return response()->json([
-                'code' => 0
-            ]);
-        }
-        $responce = $card->level >= $door->level;
-
-        if (!empty($responce)) {
-            switch ($action) {
-                case 'lock':
-                    $level = Card::find($door->owner)->level; // level владельца
-                    if ($level > $card->level and $card->id != $door->owner) {
-                        return response()->json(['code' => 2]);
-                    }
-                    $door->update(['owner' => null]);
-                    break;
-                case 'unlock':
-                    $door->update(['owner' => $card->id]);
-                    break;
-                default:
-                    $error = 'Dont know action';
-                    break;
-            }
-        }
-        return response()->json([
-            'code' => $responce ? 1 : 2
-        ]);
+        $second = $request->query('tm',0);
+        $doorAction = new DoorActionService($action, $second);
+        return $doorAction->doorAction($cardId, $lockId);
     }
 
     public function add_lock()
