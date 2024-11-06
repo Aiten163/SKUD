@@ -45,14 +45,18 @@ class Door extends Model
             'level',
             'building',
             'owner',
-            'room'
+            'room',
+            'warn_duration',
+            'unlock_duration'
         ];
     protected $allowedFilters=[
         'level'=> Where::class,
         'id'=> Where::class,
         'building'=> Where::class,
         'room'=> Where::class,
-        'owner'=> Where::class
+        'owner'=> Where::class,
+        'warn_duration'=> Where::class,
+        'unlock_duration' =>Where::class
     ];
     public function doorLock(): HasOne
     {

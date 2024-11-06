@@ -67,6 +67,8 @@ class DoorsScreen extends Screen
                     Input::make('building')->required()->title('Корпус'),
                     Input::make('room')->required()->title('Номер двери'),
                     Input::make('owner')->type('email')->title('Владелец'),
+                    Input::make('unlock_duration')->type('time')->title('Время занятия'),
+                    Input::make('warn_duration')->type('time')->title('Время предупреждения'),
                     Select::make('lock_id')->fromModel(Lock::class, 'id')->title('Замок'),
                 ]))->title("Добавить дверь")->applyButton('Добавить'),
 
@@ -78,6 +80,8 @@ class DoorsScreen extends Screen
                         Input::make('door.building')->required()->title("Корпус"),
                         Input::make('door.owner')->required()->title('Владелец'),
                         Input::make('door.room')->required()->title('Номер двери'),
+                        Input::make('door.unlock_duration')->title('Время занятия'),
+                        Input::make('door.warn_duration')->title('Время предупреждения'),
                     ]
                 ))->async('asyncGetDoor')
             ];
@@ -102,12 +106,6 @@ class DoorsScreen extends Screen
 
     public function create(Request $request): void
     {
-        $request->validate([
-            'room'=> ['required'],
-            'level'=> ['required'],
-            'lock_id'=> ['required'],
-            'owner'=> ['required'],
-        ]);
         door::create($request->merge([
         ])->except('_token'));
         FacadesToast::info('Дверь успешно добавлена');

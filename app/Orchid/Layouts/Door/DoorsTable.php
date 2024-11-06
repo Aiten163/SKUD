@@ -31,6 +31,8 @@ class DoorsTable extends Table
             TD::make('room', 'Номер двери')->sort()->filter(),
             TD::make('building', 'Корпус')->sort()->filter(),
             TD::make('owner', 'Владелец')->sort()->filter(),
+            TD::make('unlock_duration', 'Время занятия')->sort()->filter(),
+            TD::make('warn_duration', 'Время предупреждения')->sort()->filter(),
             TD::make('action', '')->cantHide()->render(function (Door $Door)
             {
                 return ModalToggle::make("")
