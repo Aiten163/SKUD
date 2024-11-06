@@ -9,13 +9,11 @@ use Illuminate\Http\JsonResponse;
 
 class DoorActionService
 {
-    protected int $second;
     protected $lock;
     protected string $action;
 
-    public function __construct($action, $second = null)
+    public function __construct($action)
     {
-        $this->second = $second;
         $this->action = $action;
     }
 
@@ -72,13 +70,17 @@ class DoorActionService
     private function unlockDoor($card, $door): JsonResponse
     {
         if ($door->owner) {
-            if ($this->lock->time_end < now()->timestamp)
-                return response()->json(['error' => 'Status action or time error']);
+            return response()->json(['error' => 'Status action error']);
         }
         if ($card->level >= $door->level) {
             $door->update(['owner' => $card->id]);
-            $this->lock->time_end = $this->second + now()->timestamp;
-            return response()->json(['code' => 1]);
+            return response()->json(
+                [
+                    'code' => 1,
+                    'unlockDuration' => $door->unlock_duration,
+                    'alarmDuration' => $door->warn_duration
+                ]
+            );
         } else {
             return response()->json(['code' => 2]);
         }

@@ -19,8 +19,7 @@ class DoorController extends Controller
         $action = $request->query('action');
         $lockId = $request->query('lock_id');
         $cardId = $request->query('card_id');
-        $second = $request->query('tm',0);
-        $doorAction = new DoorActionService($action, $second);
+        $doorAction = new DoorActionService($action);
         return $doorAction->doorAction($cardId, $lockId);
     }
 

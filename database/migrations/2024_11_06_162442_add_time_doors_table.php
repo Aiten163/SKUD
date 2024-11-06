@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('locks', function (Blueprint $table) {
-            $table->timestamp('time_end');
+        Schema::table('doors', function (Blueprint $table) {
+            $table->time('unlock_duration')->nullable()->default('01:45:00');
+            $table->time('warn_duration')->nullable()->default('00:05:00');
         });
     }
 
@@ -21,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropColumns('locks',['time_end'] );
+        Schema::dropColumns('doors',['unlock_duration','unlock_duration']);
     }
 };
