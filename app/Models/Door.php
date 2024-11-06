@@ -54,9 +54,7 @@ class Door extends Model
         'id'=> Where::class,
         'building'=> Where::class,
         'room'=> Where::class,
-        'owner'=> Where::class,
-        'warn_duration'=> Where::class,
-        'unlock_duration' =>Where::class
+        'owner'=> Where::class
     ];
     public function doorLock(): HasOne
     {

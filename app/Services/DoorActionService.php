@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Add_lock;
 use App\Models\Lock;
 use App\Models\Card;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
 class DoorActionService
@@ -77,8 +78,8 @@ class DoorActionService
             return response()->json(
                 [
                     'code' => 1,
-                    'unlockDuration' => $door->unlock_duration,
-                    'alarmDuration' => $door->warn_duration
+                    'unlockDuration' => Carbon::createFromTimestampUTC($door->unlock_duration)->secondsSinceMidnight(),
+                    'alarmDuration' => Carbon::createFromTimestampUTC($door->warn_duration)->secondsSinceMidnight()
                 ]
             );
         } else {

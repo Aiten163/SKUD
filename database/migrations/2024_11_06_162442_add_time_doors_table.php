@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropColumns('doors',['unlock_duration','unlock_duration']);
+        Schema::dropColumns('doors',['unlock_duration','warn_duration']);
     }
 };

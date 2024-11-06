@@ -8,6 +8,7 @@ use App\Orchid\Layouts\Door\DoorsTable;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Orchid\Screen\Fields\DateTimer;
 use Orchid\Screen\Fields\Select;
 use \Orchid\Support\Facades\Toast;
 use Orchid\Screen\Actions\ModalToggle;
@@ -63,12 +64,14 @@ class DoorsScreen extends Screen
             [
                 DoorsTable::class,
                 Layout::modal('createdoor', Layout::rows([
-                    Input::make('level')->required()->title('Уровень'),
-                    Input::make('building')->required()->title('Корпус'),
-                    Input::make('room')->required()->title('Номер двери'),
-                    Input::make('owner')->type('email')->title('Владелец'),
-                    Input::make('unlock_duration')->type('time')->title('Время занятия'),
-                    Input::make('warn_duration')->type('time')->title('Время предупреждения'),
+                    Input::make('level')->title('Уровень'),
+                    Input::make('building')->title('Корпус'),
+                    Input::make('room')->title('Номер двери'),
+                    Input::make('owner')->title('Владелец'),
+                    DateTimer::make('unlock_duration')->title('Время занятия')
+                        ->noCalendar()->format('H:i')->format24hr()->enableTime(),
+                    DateTimer::make('warn_duration')->title('Время предупреждения')
+                        ->noCalendar()->format('H:i')->format24hr()->enableTime(),
                     Select::make('lock_id')->fromModel(Lock::class, 'id')->title('Замок'),
                 ]))->title("Добавить дверь")->applyButton('Добавить'),
 
@@ -76,12 +79,14 @@ class DoorsScreen extends Screen
                 (
                     [
                         Input::make('door.id')->type('hidden'),
-                        Input::make('door.level')->required()->title("Уровень"),
-                        Input::make('door.building')->required()->title("Корпус"),
-                        Input::make('door.owner')->required()->title('Владелец'),
-                        Input::make('door.room')->required()->title('Номер двери'),
-                        Input::make('door.unlock_duration')->title('Время занятия'),
-                        Input::make('door.warn_duration')->title('Время предупреждения'),
+                        Input::make('door.level')->title("Уровень"),
+                        Input::make('door.building')->title("Корпус"),
+                        Input::make('door.owner')->title('Владелец'),
+                        Input::make('door.room')->title('Номер двери'),
+                        DateTimer::make('unlock_duration')->title('Время занятия')
+                            ->noCalendar()->format('H:i')->format24hr()->enableTime(),
+                        DateTimer::make('warn_duration')->title('Время предупреждения')
+                            ->noCalendar()->format('H:i')->format24hr()->enableTime(),
                     ]
                 ))->async('asyncGetDoor')
             ];
