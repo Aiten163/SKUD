@@ -70,7 +70,7 @@ class DoorActionService
         $second = Carbon::createFromFormat('H:i:s', $door->warn_duration)->secondsSinceMidnight();
         if ($door->owner) {
             if ($this->lock->time_end < now()->timestamp + $second) {
-                return response()->json(['code' => '0', 'error' => 'Status repeat']);
+                return response()->json(['code' => '0', 'error' => 'Action repeat']);
             }
         }
         if ($card->level >= $door->level) {
