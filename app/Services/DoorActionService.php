@@ -67,19 +67,20 @@ class DoorActionService
 
     private function unlockDoor($card, $door): JsonResponse
     {
+        $second = Carbon::createFromFormat('H:i:s', $door->warn_duration)->secondsSinceMidnight();
         if ($door->owner) {
             if ($this->lock->time_end < now()->timestamp) {
-                return response()->json(['time_end' =>$this->lock->time_end , 'now' => now()->timestamp, 'should'=>Carbon::make($door->warn_duration)->timestamp + now()->timestamp]);
+                return response()->json(['time_end' =>$this->lock->time_end , 'now' => now()->timestamp, 'should'=>Carbon::make($door->warn_duration)->timestamp + $second]);
                 return response()->json(['code' => '0', 'error' => 'Action repeat']);
             }
         }
         if ($card->level >= $door->level) {
             $door->update(['owner' => $card->id]);
-            $this->lock->time_end = Carbon::make($door->warn_duration)->timestamp + now()->timestamp;
+            $this->lock->time_end = Carbon::make($door->warn_duration)->timestamp + $second;
             return response()->json(
                 [
                     'code' => 1,
-                    'unlockDuration' => Carbon::createFromFormat('H:i:s', $door->warn_duration)->secondsSinceMidnight(),
+                    'unlockDuration' => $second,
                     'alarmDuration' => Carbon::createFromFormat('H:i:s', $door->warn_duration)->secondsSinceMidnight()
                 ]
             );
