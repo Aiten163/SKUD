@@ -67,7 +67,7 @@ class DoorActionService
 
     private function unlockDoor($card, $door): JsonResponse
     {
-        $second = Carbon::createFromFormat('H:i:s', $door->unlockDuration)->secondsSinceMidnight();
+        $second = Carbon::createFromFormat('H:i:s', $door->unlock_duration)->secondsSinceMidnight();
         if ($door->owner) {
             if ($this->lock->time_end > now()->timestamp) {
                 return response()->json(['code' => '0', 'error' => 'Action repeat']);
