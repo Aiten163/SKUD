@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('locks', function (Blueprint $table) {
-            $table->unsignedMediumInteger('time_end');
+            $table->unsignedBigInteger('time_end');
         });
     }
     /**
