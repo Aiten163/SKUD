@@ -20,13 +20,10 @@ class DoorActionService
 
     public function doorAction($cardId, $lockId): JsonResponse
     {
-
-        if (Add_lock::first()->status) {
-            $this->lock = Lock::find($lockId);
-            if (!$this->lock) {
+        $this->lock = Lock::find($lockId);
+        if (Add_lock::first()->status && !$this->lock) {
                 Lock::create(['id' => $lockId]);
                 return response()->json(['code' => 3]);
-            }
         }
 
         if (!$lockId || !$this->isValidAction()) {
@@ -78,8 +75,8 @@ class DoorActionService
             return response()->json(
                 [
                     'code' => 1,
-                    'unlockDuration' => Carbon::createFromTimestampUTC($door->unlock_duration)->secondsSinceMidnight(),
-                    'alarmDuration' => Carbon::createFromTimestampUTC($door->warn_duration)->secondsSinceMidnight()
+                    'unlockDuration' => Carbon::createFromFormat('H:i:s', $door->unlock_duration)->secondsSinceMidnight(),
+                    'alarmDuration' => Carbon::createFromFormat('H:i:s', $door->warn_duration)->secondsSinceMidnight()
                 ]
             );
         } else {
