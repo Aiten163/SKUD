@@ -69,9 +69,9 @@ class DoorsScreen extends Screen
                     Input::make('room')->title('Номер двери'),
                     Input::make('owner')->title('Владелец'),
                     DateTimer::make('unlock_duration')->title('Время занятия')
-                        ->noCalendar()->format('H:i')->format24hr()->enableTime(),
+                        ->noCalendar()->format('H:i')->format24hr()->enableTime()->allowInput()->minuteIncrement(1),
                     DateTimer::make('warn_duration')->title('Время предупреждения')
-                        ->noCalendar()->format('H:i')->format24hr()->enableTime(),
+                        ->noCalendar()->format('H:i')->format24hr()->enableTime()->allowInput()->minuteIncrement(1),
                     Select::make('lock_id')->fromModel(Lock::class, 'id')->title('Замок'),
                 ]))->title("Добавить дверь")->applyButton('Добавить'),
 
@@ -84,9 +84,9 @@ class DoorsScreen extends Screen
                         Input::make('door.owner')->title('Владелец'),
                         Input::make('door.room')->title('Номер двери'),
                         DateTimer::make('door.unlock_duration')->title('Время занятия')
-                            ->noCalendar()->format('H:i')->format24hr()->enableTime(),
+                            ->noCalendar()->format('H:i')->format24hr()->enableTime()->allowInput()->minuteIncrement(1),
                         DateTimer::make('door.warn_duration')->title('Время предупреждения')
-                            ->noCalendar()->format('H:i')->format24hr()->enableTime(),
+                            ->noCalendar()->format('H:i')->format24hr()->enableTime()->allowInput()->minuteIncrement(1),
                     ]
                 ))->async('asyncGetDoor')
             ];
