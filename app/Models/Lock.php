@@ -32,7 +32,7 @@ class Lock extends Model
     use HasFactory;
     use Filterable;
     use AsMultiSource;
-    protected $fillable = ['id','door_id'];
+    protected $fillable = ['id','door_id','time_end'];
     protected $allowedFilters=[
         'door_id'=> Where::class,
         'id'=> Where::class,

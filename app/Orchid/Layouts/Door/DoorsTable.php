@@ -37,8 +37,8 @@ class DoorsTable extends Table
             TD::make('time', 'Время занятия/предупреждения')
                 ->render(function ($door) {
                     // Преобразуем значения в объекты Carbon, чтобы использовать форматирование
-                    $unlockTime = Carbon::createFromFormat('H:i:s', $door->unlock_duration)->format('H:i');
-                    $warnTime = Carbon::createFromFormat('H:i:s', $door->warn_duration)->format('H:i');
+                    $unlockTime = Carbon::createFromFormat('H:i:s', $door->unlock_duration)->format('H:i:s');
+                    $warnTime = Carbon::createFromFormat('H:i:s', $door->warn_duration)->format('H:i:s');
 
                     return "<span style='line-height: 1.2;'>{$unlockTime}<br>{$warnTime}</span>";
                 }),
