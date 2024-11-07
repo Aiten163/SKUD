@@ -55,7 +55,7 @@ class DoorActionService
     private function lockDoor($door): JsonResponse
     {
         if (empty($door->owner)) {
-            return response()->json(['error' => 'Status action error']);
+            return response()->json(['code' => '0']);
         }
 
         if (Card::find($door->owner)) {
@@ -68,7 +68,7 @@ class DoorActionService
     private function unlockDoor($card, $door): JsonResponse
     {
         if ($door->owner) {
-            return response()->json(['error' => 'Status action error']);
+            return response()->json(['code' => '0']);
         }
         if ($card->level >= $door->level) {
             $door->update(['owner' => $card->id]);
