@@ -75,7 +75,7 @@ class DoorActionService
         }
         if ($card->level >= $door->level) {
             $door->update(['owner' => $card->id]);
-            $this->lock->time_end = Carbon::make(now()->timestamp)->timestamp + $second;
+            $this->lock->time_end = now()->timestamp + $second;
             $this->lock->save();
             return response()->json(
                 [
