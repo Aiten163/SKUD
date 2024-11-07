@@ -69,7 +69,7 @@ class DoorActionService
     {
         if ($door->owner) {
             if ($this->lock->time_end < now()->timestamp) {
-                return response()->json(['time_end' =>$this->lock->time_end , 'now' => now()->timestamp, 'should'=>Carbon::make($door->warn_duration)->timestamp + now()->timestamp;]);
+                return response()->json(['time_end' =>$this->lock->time_end , 'now' => now()->timestamp, 'should'=>Carbon::make($door->warn_duration)->timestamp + now()->timestamp]);
                 return response()->json(['code' => '0', 'error' => 'Action repeat']);
             }
         }
