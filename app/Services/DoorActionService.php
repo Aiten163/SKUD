@@ -44,7 +44,7 @@ class DoorActionService
             case 'unlock':
                 return $this->unlockDoor($card, $door);
         }
-        return response()->json(['code' => 0]);
+        return response()->json(['code' => 0, 'error => Action not find']);
     }
 
     private function isValidAction(): bool
@@ -68,10 +68,13 @@ class DoorActionService
     private function unlockDoor($card, $door): JsonResponse
     {
         if ($door->owner) {
-            return response()->json(['code' => '0']);
+            if ($this->lock->time_end < now()->timestamp + $door->unlock_time) {
+                return response()->json(['code' => '0', 'error' => 'Status action or time error']);
+            }
         }
         if ($card->level >= $door->level) {
             $door->update(['owner' => $card->id]);
+            $this->lock->time_end = $door->unlock_duration + now()->timestamp;
             return response()->json(
                 [
                     'code' => 1,
