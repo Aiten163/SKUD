@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Orchid\Filters\Filterable;
 use Orchid\Filters\Types\Where;
 use Orchid\Screen\AsMultiSource;
@@ -59,5 +60,9 @@ class Door extends Model
     public function doorLock(): HasOne
     {
         return $this->hasOne(Lock::class);
+    }
+    public function LogDoor(): HasMany
+    {
+        return $this->hasMany(DoorLog::class);
     }
 }

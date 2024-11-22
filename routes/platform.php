@@ -22,6 +22,7 @@ use Tabuna\Breadcrumbs\Trail;
 use App\Orchid\Screens\DoorsScreen;
 use App\Orchid\Screens\LocksScreen;
 use App\Orchid\Screens\CardsScreen;
+use App\Orchid\Screens\LogsDoorScreen;
 /*
 |--------------------------------------------------------------------------
 | Dashboard Routes
@@ -39,6 +40,9 @@ Route::screen('/main', PlatformScreen::class)
 
 Route::screen('/doors', DoorsScreen::class )
     ->name('platform.doors');
+
+Route::screen('/logs', LogsDoorScreen::class)
+    ->name('platform.logs');
 
 Route::screen('/locks', LocksScreen::class )
     ->name('platform.locks');

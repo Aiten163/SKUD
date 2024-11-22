@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Add_lock;
 use App\Models\Card;
 use App\Models\Door;
+use App\Models\DoorLog;
 use App\Models\Lock;
 use App\Services\DoorActionService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,7 +21,9 @@ class DoorController extends Controller
         $lockId = $request->query('lock_id');
         $cardId = $request->query('card_id');
         $doorAction = new DoorActionService($action);
-        return $doorAction->doorAction($cardId, $lockId);
+        $res = $doorAction->doorAction($cardId, $lockId);
+        $doorAction->createLog($res['code'], isset($res['unlockDuration']));
+         return response()->json($res);
     }
 
     public function add_lock()
