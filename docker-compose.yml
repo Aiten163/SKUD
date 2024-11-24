@@ -46,16 +46,17 @@ services:
     tty: true
 
   mysql:
-    image: mysql:8.0
-    volumes:
-    - database:/var/lib/mysql
-    environment:
-      - "MYSQL_ROOT_PASSWORD=secret"
-      - "MYSQL_USER=user"
-      - "MYSQL_PASSWORD=secret"
-      - "MYSQL_DATABASE=laravel"
-    ports:
-    - "33061:3306"
+      image: mysql:8.0
+      volumes:
+          - database:/var/lib/mysql
+          - ./docker/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      environment:
+          - MYSQL_ROOT_PASSWORD=secret
+          - MYSQL_USER=user
+          - MYSQL_PASSWORD=secret
+          - MYSQL_DATABASE=laravel
+      ports:
+          - "33061:3306"
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
