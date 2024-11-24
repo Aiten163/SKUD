@@ -51,10 +51,10 @@ services:
           - database:/var/lib/mysql
           - ./docker/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
       environment:
-          - MYSQL_ROOT_PASSWORD=secret
-          - MYSQL_USER=user
-          - MYSQL_PASSWORD=secret
-          - MYSQL_DATABASE=laravel
+          - "MYSQL_ROOT_PASSWORD=secret"
+          - "MYSQL_USER=user"
+          - "MYSQL_PASSWORD=secret"
+          - "MYSQL_DATABASE=laravel"
       ports:
           - "33061:3306"
   phpmyadmin:
