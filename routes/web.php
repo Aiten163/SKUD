@@ -3,5 +3,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/admin/logs');
+    return redirect('http://скуд.саранск.рус/admin/logs');
 });

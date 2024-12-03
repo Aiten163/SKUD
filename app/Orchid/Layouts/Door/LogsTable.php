@@ -31,6 +31,7 @@ class LogsTable extends Table
         return [
             TD::make('id', 'ID')->sort()->filter(TD::FILTER_NUMERIC),
             TD::make('action', 'Действие')->sort()->filter(),
+            TD::make('time', 'Время')->filter(),
             TD::make('door_id', 'ID двери')->sort()->filter(),
             TD::make('card_id', 'ID карточки')->sort()->filter(),
             TD::make('room', 'Номер комнаты')->filter()
