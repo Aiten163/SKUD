@@ -1,23 +1,23 @@
 version: '3.2'
 services:
-    nginx:
-        build:
-            context: ./docker/nginx
-            dockerfile: Dockerfile
-        volumes:
-            - ./:/var/www
-            - ./certs:/etc/letsencrypt
-        environment:
-            - "DB_PORT=3306"
-            - "DB_HOST=mysql"
-            - "XDG_CONFIG_HOME=/app"
-        ports:
-            - "80:80"
-            - "443:443"
-        links:
-            - php-fpm
-            - node
-        command: /bin/sh -c "if [ ! -f /etc/letsencrypt/live/xn--d1aluj.xn--80aa4alnee.xn--p1acf/fullchain.pem ]; then certbot certonly --standalone -d xn--d1aluj.xn--80aa4alnee.xn--p1acf; fi && nginx -g 'daemon off;'"
+  nginx:
+      build:
+          context: ./docker/nginx
+          dockerfile: Dockerfile
+      volumes:
+          - ./:/var/www
+          - ./certs:/etc/letsencrypt
+      environment:
+          - "DB_PORT=3306"
+          - "DB_HOST=mysql"
+          - "XDG_CONFIG_HOME=/app"
+      ports:
+          - "80:80"
+          - "443:443"
+      links:
+          - php-fpm
+          - node
+      command: /bin/sh -c "if [ ! -f /etc/letsencrypt/live/xn--d1aluj.xn--80aa4alnee.xn--p1acf/fullchain.pem ]; then certbot certonly --standalone -d xn--d1aluj.xn--80aa4alnee.xn--p1acf; fi && nginx -g 'daemon off;'"
 
   php-fpm:
     build:
