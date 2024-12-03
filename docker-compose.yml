@@ -17,7 +17,7 @@ services:
       links:
           - php-fpm
           - node
-      command: /bin/sh -c "if [ ! -f /etc/letsencrypt/live/xn--d1aluj.xn--80aa4alnee.xn--p1acf/fullchain.pem ]; then certbot certonly --standalone --non-interactive --agree-tos --email your-email@example.com -d xn--d1aluj.xn--80aa4alnee.xn--p1acf; fi && nginx -g 'daemon off;'"
+      command: /bin/sh -c "if [ ! -f /etc/letsencrypt/live/xn--d1aluj.xn--80aa4alnee.xn--p1acf/fullchain.pem ]; then certbot certonly --standalone --non-interactive --agree-tos --email uuum1984@mail.ru -d xn--d1aluj.xn--80aa4alnee.xn--p1acf; fi && nginx -g 'daemon off;'"
 
   php-fpm:
     build:
