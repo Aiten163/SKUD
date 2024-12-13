@@ -1,6 +1,7 @@
 version: '3.2'
 services:
   nginx:
+      restart: always
       build:
           context: ./docker/nginx
           dockerfile: Dockerfile
@@ -20,6 +21,7 @@ services:
       command: /bin/sh -c "if [ ! -f /etc/letsencrypt/live/xn--d1aluj.xn--80aa4alnee.xn--p1acf/fullchain.pem ]; then certbot certonly --standalone --non-interactive --agree-tos --email uuum1984@mail.ru -d xn--d1aluj.xn--80aa4alnee.xn--p1acf; fi && nginx -g 'daemon off;'"
 
   php-fpm:
+    restart: always
     build:
       context: ./docker/php-fpm
       dockerfile: Dockerfile
@@ -35,6 +37,7 @@ services:
       - node
 
   php-cli:
+    restart: always
     build:
       context: ./
       dockerfile: docker/php-cli.docker
@@ -49,6 +52,7 @@ services:
     tty: true
 
   mysql:
+      restart: always
       image: mysql:8.0
       volumes:
           - database:/var/lib/mysql
@@ -61,6 +65,7 @@ services:
       ports:
           - "33061:3306"
   phpmyadmin:
+    restart: always
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     environment:
@@ -68,7 +73,6 @@ services:
       - PMA_USER=user
       - PMA_PASSWORD=secret
       - UPLOAD_LIMIT=64M
-    restart: always
     ports:
       - 8081:80
   node:
