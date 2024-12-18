@@ -22,8 +22,12 @@ class DoorController extends Controller
         $cardId = $request->query('card_id');
         $doorAction = new DoorActionService($action);
         $res = $doorAction->doorAction($cardId, $lockId);
-        $doorAction->createLog($res['code'], isset($res['unlockDuration']));
-         return response()->json($res);
+        try {
+            $doorAction->createLog($res['code'], isset($res['unlockDuration']));
+        } catch (ModelNotFoundException $e) {
+            DoorLog::create(['action'=>'Ошибка: ' . $e->getMessage()]);
+        }
+        return response()->json($res);
     }
 
     public function add_lock()
