@@ -30,7 +30,7 @@ class DoorActionService
             $this->lock->id = 0;
         }
 
-        if (Add_lock::first()->status && !$this->lock->id) {
+        if (Add_lock::first()->status && $this->lock->id==0) {
                 Lock::create(['id' => $lockId]);
                 return ['code' => 3];
         }
