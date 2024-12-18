@@ -113,9 +113,9 @@ class DoorActionService
                 break;
         }
         DoorLog::create([
-            'action' => $action,
-            'card_id' => $this->cardId,
-            'door_id' => $this->lock->door_id,
+            'action' => isset($action)?$action:'',
+            'card_id' => isset($this->cardId)?$this->cardId:'',
+            'door_id' => isset($this->lock->door_id)?$this->lock->door_id:'',
         ]);
     }
 }
