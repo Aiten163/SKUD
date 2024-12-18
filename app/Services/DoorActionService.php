@@ -22,7 +22,7 @@ class DoorActionService
 
     public function doorAction($cardId, $lockId): array
     {
-        $this->lock = Lock::find($lockId);
+        $this->lock = Lock::findorFail($lockId);
         if (Add_lock::first()->status && !$this->lock) {
                 Lock::create(['id' => $lockId]);
                 return ['code' => 3];
