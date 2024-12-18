@@ -8,7 +8,7 @@ use App\Models\Lock;
 use App\Models\Card;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use mysql_xdevapi\Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DoorActionService
 {
@@ -24,11 +24,12 @@ class DoorActionService
     public function doorAction($cardId, $lockId): array
     {
         try {
-            $this->lock = Lock::find($lockId);
-        } catch (Exception $e) {
+            $this->lock = Lock::findOrFail($lockId);
+        } catch (ModelNotFoundException $e) {
             $this->lock = new Lock();
             $this->lock->id = 0;
         }
+
         if (Add_lock::first()->status && !$this->lock->id) {
                 Lock::create(['id' => $lockId]);
                 return ['code' => 3];
