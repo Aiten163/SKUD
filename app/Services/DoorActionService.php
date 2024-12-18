@@ -8,6 +8,7 @@ use App\Models\Lock;
 use App\Models\Card;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use mysql_xdevapi\Exception;
 
 class DoorActionService
 {
@@ -22,8 +23,13 @@ class DoorActionService
 
     public function doorAction($cardId, $lockId): array
     {
-        $this->lock = Lock::find($lockId);
-        if (Add_lock::first()->status && !$this->lock) {
+        try {
+            $this->lock = Lock::findOrFail($lockId);
+        } catch (Exception $e) {
+            $this->lock = new Lock();
+            $this->lock->id = 0;
+        }
+        if (Add_lock::first()->status && !$this->lock->id) {
                 Lock::create(['id' => $lockId]);
                 return ['code' => 3];
         }
