@@ -24,7 +24,7 @@ class DoorActionService
     public function doorAction($cardId, $lockId): array
     {
         try {
-            $this->lock = Lock::findOrFail($lockId);
+            $this->lock = Lock::find($lockId);
         } catch (Exception $e) {
             $this->lock = new Lock();
             $this->lock->id = 0;
