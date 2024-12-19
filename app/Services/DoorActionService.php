@@ -8,6 +8,7 @@ use App\Models\Lock;
 use App\Models\Card;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DoorActionService
 {
@@ -22,8 +23,14 @@ class DoorActionService
 
     public function doorAction($cardId, $lockId): array
     {
-        $this->lock = Lock::find($lockId);
-        if (Add_lock::first()->status && !$this->lock) {
+        try {
+            $this->lock = Lock::findOrFail($lockId);
+        } catch (ModelNotFoundException $e) {
+            $this->lock = new Lock();
+            $this->lock->id = 0;
+        }
+
+        if (Add_lock::first()->status && $this->lock->id==0) {
                 Lock::create(['id' => $lockId]);
                 return ['code' => 3];
         }
@@ -106,9 +113,9 @@ class DoorActionService
                 break;
         }
         DoorLog::create([
-            'action' => $action,
-            'card_id' => $this->cardId,
-            'door_id' => $this->lock->door_id,
+            'action' => isset($action)?$action:null,
+            'card_id' => isset($this->cardId)?$this->cardId:null,
+            'door_id' => isset($this->lock->door_id)?$this->lock->door_id:null,
         ]);
     }
 }
