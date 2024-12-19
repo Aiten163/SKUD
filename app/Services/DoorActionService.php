@@ -12,8 +12,8 @@ use Illuminate\Http\JsonResponse;
 class DoorActionService
 {
     protected Lock $lock;
-    protected int $cardId;
-    protected string $action;
+    protected  $cardId;
+    protected  $action;
 
     public function __construct($action)
     {
