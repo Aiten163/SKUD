@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class DoorActionService
 {
     protected Lock $lock;
-    protected  $cardId;
+    protected  $card;
     protected  $action;
 
     public function __construct($action)
@@ -21,7 +21,7 @@ class DoorActionService
         $this->action = $action;
     }
 
-    public function doorAction($cardId, $lockId): array
+    public function doorAction($cardUid, $lockId): array
     {
         try {
             $this->lock = Lock::findOrFail($lockId);
@@ -39,18 +39,16 @@ class DoorActionService
             return ['code' => 0];
         }
 
-        $card = Card::where('uid', $cardId)->first();
-        if (!$card) {
+        $this->card = Card::where('uid', $cardUid)->first();
+        if (!$this->card) {
             return ['code' => 2];
         }
-        $this->cardId = $cardId;
         $door = $this->lock->door;
-
         switch ($this->action) {
             case 'lock':
                 return $this->lockDoor($door);
             case 'unlock':
-                return $this->unlockDoor($card, $door);
+                return $this->unlockDoor($door);
         }
         return ['code' => 0, 'error => Action not find'];
     }
@@ -73,7 +71,7 @@ class DoorActionService
         return ['code' => 2];
     }
 
-    private function unlockDoor($card, $door): array
+    private function unlockDoor($door): array
     {
         $second = Carbon::createFromFormat('H:i:s', $door->unlock_duration)->secondsSinceMidnight();
         if ($door->owner) {
@@ -81,8 +79,8 @@ class DoorActionService
                 return ['code' => '0', 'error' => 'Action repeat'];
             }
         }
-        if ($card->level >= $door->level) {
-            $door->update(['owner' => $card->id]);
+        if ($this->card->level >= $door->level) {
+            $door->update(['owner' => $this->card->id]);
             $this->lock->time_end = now()->timestamp + $second;
             $this->lock->save();
             return
@@ -114,7 +112,7 @@ class DoorActionService
         }
         DoorLog::create([
             'action' => isset($action)?$action:null,
-            'card_id' => isset($this->cardId)?$this->cardId:null,
+            'card_id' => isset($this->card->id)?$this->card->id:null,
             'door_id' => isset($this->lock->door_id)?$this->lock->door_id:null,
         ]);
     }
