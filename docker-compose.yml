@@ -62,6 +62,7 @@ services:
           - "MYSQL_USER=user"
           - "MYSQL_PASSWORD=secret"
           - "MYSQL_DATABASE=laravel"
+          - "TZ=Europe/Moscow"
       ports:
           - "33061:3306"
   phpmyadmin:
