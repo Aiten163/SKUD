@@ -1,8 +1,4 @@
 <div class="p-5">
-    <!-- Контейнер для кода двухфакторной аутентификации -->
-    <div id="two-factor-auth" class="text-center">
-        <h2>Двухфакторная аутентификация</h2>
-
         <!-- Поле ввода времени -->
         <input type="number" id="time-input" placeholder="Время (в секундах)" class="form-control mt-3" value="60">
 
@@ -14,7 +10,6 @@
 
         <!-- Таймер -->
         <div id="timer-display" class="mt-2 text-danger"></div>
-    </div>
 </div>
 
 <!-- Подключаем JavaScript файл -->

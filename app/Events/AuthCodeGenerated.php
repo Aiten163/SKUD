@@ -22,7 +22,6 @@ class AuthCodeGenerated implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        echo "111111111111";
         // Используем публичный канал для генерации кода.
         return new Channel('auth');
     }

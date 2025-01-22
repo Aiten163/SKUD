@@ -24,7 +24,7 @@ class AuthScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'AuthScreen';
+        return 'Двухфакторная аутентификация';
     }
 
     /**
