@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthCodeController;
 use App\Http\Controllers\API\DoorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,3 +25,5 @@ Route::controller(DoorController::class)->group(function () {
     Route::get('/door/getCards', 'getCards')->name('getCards');
 });
 
+Route::post('/generate-code', [AuthCodeController::class, 'generateCode']);
+Route::post('/remove-code', [AuthCodeController::class, 'deleteCode']);

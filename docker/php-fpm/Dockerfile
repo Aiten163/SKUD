@@ -1,29 +1,32 @@
 FROM php:8.3-fpm
 
-RUN apt-get update && apt-get install -y libmcrypt-dev libpng-dev mariadb-client \
+# Установка всех необходимых зависимостей
+RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libgd-dev \
-    && docker-php-ext-install pdo_mysql
+    mariadb-client \
+    wget \
+    unzip \
+    curl \
+    jpegoptim \
+    optipng \
+    pngquant \
+    gifsicle \
+    libavif-bin \
+    && docker-php-ext-configure exif \
+    && docker-php-ext-install -j$(nproc) exif pdo_mysql pcntl \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-configure exif
-RUN docker-php-ext-install exif
-RUN docker-php-ext-enable exif
+# Установка Composer
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
-RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/  --with-jpeg=/usr/include/
-RUN docker-php-ext-install -j$(nproc) gd
-
-RUN apt install jpegoptim optipng pngquant gifsicle libavif-bin -y
-
-RUN apt-get install -y wget unzip curl
-RUN curl -sS https://getcomposer.org/installer |php
-RUN mv composer.phar /usr/local/bin/composer
-
+# Копирование конфигурации PHP
 COPY ./conf.d /usr/local/etc/php/conf.d/
 
+# Установка рабочего каталога
 WORKDIR /var/www
-
-
-

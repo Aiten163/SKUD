@@ -33,6 +33,7 @@ services:
       - "REDIS_PORT=6379"
       - "REDIS_HOST=redis"
     links:
+      - redis
       - mysql
       - node
 
@@ -46,8 +47,11 @@ services:
     environment:
       - "DB_PORT=3306"
       - "DB_HOST=mysql"
+      - "REDIS_PORT=6379"
+      - "REDIS_HOST=redis"
       - "COMPOSER_MEMORY_LIMIT=-1"
     links:
+      - redis
       - mysql
     tty: true
 
@@ -85,5 +89,15 @@ services:
     working_dir: /var/www
     tty: true
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+        - "6379:6379"
+    volumes:
+        - redis:/data
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+
 volumes:
-  database:
+    database:
+    redis:

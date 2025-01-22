@@ -46,6 +46,9 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make('Логи')
                 ->icon('bs.card-list')
                 ->route('platform.logs'),
+            Menu::make('Auth')
+                ->icon('bs.123')
+                ->route('platform.auth'),
             Menu::make(__('Users'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')

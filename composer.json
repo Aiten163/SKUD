@@ -11,7 +11,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "orchid/icons": "^2.0",
-        "orchid/platform": "^14.39"
+        "orchid/platform": "^14.39",
+        "predis/predis": "^2.3"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.2",

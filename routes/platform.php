@@ -12,6 +12,7 @@ use App\Orchid\Screens\Examples\ExampleLayoutsScreen;
 use App\Orchid\Screens\Examples\ExampleScreen;
 use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
 use App\Orchid\Screens\PlatformScreen;
+use App\Orchid\Screens\AuthScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
@@ -48,6 +49,8 @@ Route::screen('/locks', LocksScreen::class )
     ->name('platform.locks');
 Route::screen('/cards',CardsScreen::class )
     ->name('platform.cards');
+Route::screen('/auth',AuthScreen::class )
+    ->name('platform.auth');
 
 // Platform > Profile
 Route::screen('profile', UserProfileScreen::class)
