@@ -88,6 +88,11 @@ services:
     - ./:/var/www
     working_dir: /var/www
     tty: true
+    command: >
+        sh -c "npm install &&
+               npm install --save-dev laravel-echo pusher-js &&
+               npm run build &&
+               npm run start"
 
   redis:
     image: redis:7-alpine
