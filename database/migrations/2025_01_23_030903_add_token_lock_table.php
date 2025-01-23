@@ -17,9 +17,6 @@ return new class extends Migration
         Schema::table('locks', function (Blueprint $table) {
             $table->unsignedBigInteger('uid');
         });
-        Schema::table('locks', function (Blueprint $table) {
-            $table->id();
-        });
     }
 
     /**
@@ -29,6 +26,5 @@ return new class extends Migration
     {
         Schema::dropColumns('locks','token' );
         Schema::dropColumns('locks','uid' );
-        Schema::dropColumns('locks','id' );
     }
 };
