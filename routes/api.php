@@ -2,12 +2,10 @@
 
 use App\Http\Controllers\API\AuthCodeController;
 use App\Http\Controllers\API\DoorController;
+use App\Http\Controllers\API\RegisterLockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 Route::controller(DoorController::class)->group(function () {
 
@@ -27,3 +25,5 @@ Route::controller(DoorController::class)->group(function () {
 
 Route::post('/generate-code', [AuthCodeController::class, 'generateCode']);
 Route::post('/remove-code', [AuthCodeController::class, 'deleteCode']);
+
+Route::post('/register/{lockId}/{auth}', [RegisterLockController::class, 'registerLock']);

@@ -10,7 +10,7 @@ class AuthCodeController extends Controller
 {
     public function generateCode(Request $request)
     {
-        $code = random_int(100000, 999999);
+        $code = random_int(100000, 999999) . '';
 
         Cache::put('authCode', $code, $request->input('time', 60));
 

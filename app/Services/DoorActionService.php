@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DoorActionService
 {
-    protected Lock $lock;
+    protected  $lock;
     protected  $card;
     protected  $action;
 
