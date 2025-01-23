@@ -16,7 +16,7 @@ class LockSeeder extends Seeder
         $n = Lock::count()+1;
         for($i=$n; $i<$n+10; $i++)
         {
-            Lock::create(['door_id'=>$i, 'id'=>$i]);
+            Lock::create(['door_id'=>$i, 'id'=>$i, 'uid' => $i]);
         }
     }
 }
