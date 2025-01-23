@@ -26,4 +26,4 @@ Route::controller(DoorController::class)->group(function () {
 Route::post('/generate-code', [AuthCodeController::class, 'generateCode']);
 Route::post('/remove-code', [AuthCodeController::class, 'deleteCode']);
 
-Route::post('/register/{lockId}/{auth}', [RegisterLockController::class, 'registerLock']);
+Route::get('/register/{lockId}/{auth}', [RegisterLockController::class, 'registerLock']);
