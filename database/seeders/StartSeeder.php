@@ -8,6 +8,7 @@ use App\Models\Door;
 use App\Models\Lock;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class StartSeeder extends Seeder
 {
@@ -20,5 +21,6 @@ class StartSeeder extends Seeder
         DoorSeeder::run();
         LockSeeder::run();
         Add_lockSeeder::run();
+        Artisan::call('orchid:admin admin admin@admin.com admin');
     }
 }
