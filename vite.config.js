@@ -6,6 +6,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/test_websocket.css',
                 'resources/js/app.js',
                 'resources/js/two-factor-auth.js',
                 'resources/js/websocket.js',
