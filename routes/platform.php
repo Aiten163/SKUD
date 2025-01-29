@@ -24,6 +24,7 @@ use App\Orchid\Screens\DoorsScreen;
 use App\Orchid\Screens\LocksScreen;
 use App\Orchid\Screens\CardsScreen;
 use App\Orchid\Screens\LogsDoorScreen;
+use App\Orchid\Screens\WebsocketScreen;
 /*
 |--------------------------------------------------------------------------
 | Dashboard Routes
@@ -49,6 +50,8 @@ Route::screen('/locks', LocksScreen::class )
     ->name('platform.locks');
 Route::screen('/cards',CardsScreen::class )
     ->name('platform.cards');
+Route::screen('/websocket',WebsocketScreen::class )
+    ->name('platform.websocket');
 Route::screen('/auth',AuthScreen::class )
     ->name('platform.auth');
 

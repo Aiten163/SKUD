@@ -8,6 +8,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/two-factor-auth.js',
+                'resources/js/websocket.js',
             ],
             refresh: true,
         }),

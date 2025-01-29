@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     pngquant \
     gifsicle \
     libavif-bin \
+    git \
     && docker-php-ext-configure exif \
     && docker-php-ext-install -j$(nproc) exif pdo_mysql pcntl \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ \

@@ -1,6 +1,6 @@
 <div class="p-5">
         <!-- Поле ввода времени -->
-        <input type="number" id="time-input" placeholder="Время (в секундах)" class="form-control mt-3" value="60">
+        <input type="number" id="time-input" placeholder="Время (в секундах)" class="">
 
         <!-- Кнопка генерации -->
         <button id="generate-code" class="btn btn-primary mt-3">Сгенерировать код</button>

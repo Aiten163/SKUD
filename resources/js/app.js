@@ -1,1 +1,2 @@
-import './bootstrap';
+import './echo';
+console.log('Laravel Echo is ready!');

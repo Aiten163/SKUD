@@ -27,6 +27,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/var/www
+      - ~/.ssh:/root/.ssh:ro
     environment:
       - "DB_PORT=3306"
       - "DB_HOST=mysql"
@@ -36,6 +37,8 @@ services:
       - redis
       - mysql
       - node
+    command:
+        - php-fpm && RUN git config --global user.name "SKUD SERVER" \ && git config --global user.email uuum1984@mail.ru"
 
   php-cli:
     restart: always
@@ -79,7 +82,7 @@ services:
       - PMA_PASSWORD=secret
       - UPLOAD_LIMIT=64M
     ports:
-      - 8081:80
+      - "8081:80"
   node:
     image: node:18-alpine
     ports:

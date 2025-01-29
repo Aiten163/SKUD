@@ -24,16 +24,21 @@ services:
     volumes:
       - .:/var/www
       - ./docker/php-fpm.dev.ini:/usr/local/etc/php/conf.d/dev.ini:ro
+      - ~/.ssh:/root/.ssh:ro
     environment:
       - "DB_PORT=3306"
       - "DB_HOST=mysql"
       - "REDIS_PORT=6379"
       - "REDIS_HOST=redis"
+      - "REVERB_SERVER_PORT=6001"
+    ports:
+      - "6001:6001"
     links:
       - mysql
       - redis
       - node
-    command: php-fpm
+    command: php-fpm && RUN git config --global user.name "SKUD SERVER" \ && git config --global user.email uuum1984@mail.ru"
+
 
   php-cli:
     build:

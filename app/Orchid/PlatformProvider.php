@@ -36,7 +36,8 @@ class PlatformProvider extends OrchidServiceProvider
         return [
             Menu::make('Двери')
                 ->icon('bs.door-closed')
-                ->route('platform.doors'),
+                ->route('platform.doors')
+                 ->title('Таблицы'),
             Menu::make('Замки')
                 ->icon('bs.lock')
                 ->route('platform.locks'),
@@ -45,15 +46,21 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.cards'),
             Menu::make('Логи')
                 ->icon('bs.card-list')
-                ->route('platform.logs'),
+                ->route('platform.logs')
+                ->title('Администрирование'),
+
             Menu::make('Auth')
                 ->icon('bs.123')
                 ->route('platform.auth'),
+            Menu::make('Тест Websocket')
+                ->icon('bs.broadcast-pin')
+                ->route('platform.websocket'),
+
             Menu::make(__('Users'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')
                 ->permission('platform.systems.users')
-                ->title('Администрирование'),
+                ->title('Персонал и права'),
 
             Menu::make(__('Roles'))
                 ->icon('bs.shield')
