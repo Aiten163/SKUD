@@ -37,7 +37,7 @@ services:
       - mysql
       - redis
       - node
-    command: php-fpm && RUN git config --global user.name "SKUD SERVER" \ && git config --global user.email uuum1984@mail.ru"
+    command: php-fpm
 
 
   php-cli:

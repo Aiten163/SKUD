@@ -38,7 +38,7 @@ services:
       - mysql
       - node
     command:
-        - php-fpm && RUN git config --global user.name "SKUD SERVER" \ && git config --global user.email uuum1984@mail.ru"
+        - php-fpm
 
   php-cli:
     restart: always
