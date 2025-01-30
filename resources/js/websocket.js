@@ -1,3 +1,4 @@
-window.Echo.channel("delivery").listen("PackageSent", (event) => {
-    console.log(event);
+console.log('вебсокет');
+window.Echo.channel("auth").listenToAll((event, data) => {
+    console.log(event, data);
 });

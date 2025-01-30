@@ -1,2 +1,3 @@
+console.log('апп');
 import './echo';
-console.log('Laravel Echo is ready!');
+import './bootstrap.js';

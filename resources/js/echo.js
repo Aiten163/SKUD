@@ -1,3 +1,4 @@
+console.log('эхо');
 import Echo from 'laravel-echo';
 
 import Pusher from 'pusher-js';
