@@ -9,3 +9,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('auth', function () {
     return true;
 });
+Broadcast::channel('messageToLock', function () {
+    return true;
+});

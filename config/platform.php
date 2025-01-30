@@ -128,7 +128,6 @@ return [
     'resource' => [
         'stylesheets' => [],
         'scripts' => [
-            '/js/app.js'
         ],
     ],
 

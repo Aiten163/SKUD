@@ -1,4 +1,4 @@
-console.log('вебсокет');
-window.Echo.channel("auth").listenToAll((event, data) => {
-    console.log(event, data);
+console.log(123123123132);
+window.Echo.channel("messageToLock").listen('MessageToLock', (e) => {
+    console.log(e);
 });

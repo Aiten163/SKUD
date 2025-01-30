@@ -27,3 +27,7 @@ Route::post('/generate-code', [AuthCodeController::class, 'generateCode']);
 Route::post('/remove-code', [AuthCodeController::class, 'deleteCode']);
 
 Route::get('/register/{lockId}/{auth}', [RegisterLockController::class, 'registerLock']);
+Route::get('/w', function ($e=49681321) {
+    event('messageToLock', $e);
+    return response()->json($e);
+} );
