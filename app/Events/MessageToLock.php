@@ -25,15 +25,14 @@ class MessageToLock implements ShouldBroadcast
     public function __construct($message)
     {
         $this->message = $message;
-        Log::debug("Message to Lock : ".$message);
     }
 
     /**
      * Get the channels the event should broadcast on.
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
-        return new Channel('messageToLock');
+        return new Channel('websocketTest');
     }
 
     /**
@@ -43,10 +42,5 @@ class MessageToLock implements ShouldBroadcast
     {
         return 'messageSend';
     }
-    public function broadcastWith()
-    {
-        return [
-            'message' => $this->message,
-        ];
-    }
+
 }

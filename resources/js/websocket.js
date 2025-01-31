@@ -1,4 +1,4 @@
-console.log(123123123132);
-window.Echo.channel("messageToLock").listen('.messageSend', (e) => {
+window.Echo.channel("websocketTest")
+    .listen('.messageSend', (e) => {
     console.log(e);
 });

@@ -9,6 +9,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('auth', function () {
     return true;
 });
-Broadcast::channel('messageToLock', function () {
+Broadcast::channel('websocketTest', function () {
     return true;
 });

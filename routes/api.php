@@ -30,6 +30,5 @@ Route::get('/register/{lockId}/{auth}', [RegisterLockController::class, 'registe
 
 Route::get('/w', function ($e=49681321) {
     \App\Events\MessageToLock::dispatch($e);
-    event(new \App\Events\MessageToLock($e));
     return response()->json($e);
 } );
