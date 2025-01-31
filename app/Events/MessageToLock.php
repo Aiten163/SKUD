@@ -11,9 +11,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class MessageToLock
+class MessageToLock implements ShouldBroadcast
 {
-    use InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $message;
 
@@ -22,8 +24,8 @@ class MessageToLock
      */
     public function __construct($message)
     {
-        Log::debug("Message to Lock : ".$message);
         $this->message = $message;
+        Log::debug("Message to Lock : ".$message);
     }
 
     /**
@@ -37,10 +39,14 @@ class MessageToLock
     /**
      * Get the data to broadcast.
      */
+    public function broadcastAs(): string
+    {
+        return 'messageSend';
+    }
     public function broadcastWith()
     {
         return [
-            'message' => $this->message
+            'message' => $this->message,
         ];
     }
 }
