@@ -7,7 +7,6 @@ use App\Models\DoorLog;
 use App\Models\Lock;
 use App\Models\Card;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DoorActionService

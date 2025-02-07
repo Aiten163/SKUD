@@ -40,7 +40,6 @@ services:
       - node
     command: php-fpm
 
-
   php-cli:
     build:
       context: ./
@@ -105,6 +104,20 @@ services:
     volumes:
       - redis:/data
     command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+
+  go-server:
+    build:
+      context: ./docker/go-server
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    environment:
+      - "REDIS_HOST=redis"
+      - "REDIS_PORT=6379"
+    ports:
+      - "8082:8082"
+    links:
+      - redis
 
 volumes:
   database:
