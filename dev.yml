@@ -107,8 +107,8 @@ services:
 
   go-server:
     build:
-      context: ./docker/go-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/go-server/Dockerfile
     volumes:
       - ./:/app
     environment:

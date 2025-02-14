@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
-
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
 )
