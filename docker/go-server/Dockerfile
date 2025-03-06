@@ -3,7 +3,6 @@ FROM golang:1.20-alpine
 
 # Устанавливаем необходимые инструменты
 RUN apk add --no-cache git
-
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
@@ -23,4 +22,4 @@ RUN ls -la
 EXPOSE 8082
 
 # Запускаем сервер
-CMD ["./websocket-server"]
+CMD ["websocket-server"]
