@@ -73,7 +73,6 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadminSKUD
     environment:
       - PMA_HOST=mysql
       - PMA_USER=user
