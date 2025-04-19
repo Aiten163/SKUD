@@ -31,9 +31,9 @@ services:
       - "DB_HOST=mysql"
       - "REDIS_PORT=6379"
       - "REDIS_HOST=redis"
-      - "REVERB_SERVER_PORT=6001"
+      - "REVERB_SERVER_PORT=6004"
     ports:
-      - "6001:6001"
+      - "6004:6004"
     links:
       - mysql
       - redis
@@ -106,13 +106,11 @@ services:
 
   go-server:
     build:
-      context: .
-      dockerfile: docker/go-server/Dockerfile
-    volumes:
-      - ./:/app
+      context: ./go_websocket
+      dockerfile: Dockerfile
     environment:
-      - "REDIS_HOST=redis"
-      - "REDIS_PORT=6379"
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "8082:8082"
     links:
