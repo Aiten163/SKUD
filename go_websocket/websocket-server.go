@@ -1,125 +1,45 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"sync"
-	"github.com/go-redis/redis/v8"
-	"github.com/gorilla/websocket"
 )
 
-// Конфигурация Redis
-var redisAddr = "localhost:6379"
-var ctx = context.Background()
-
-// Redis клиент
-var redisClient *redis.Client
-
-// Подключенные WebSocket-клиенты
-var clients = make(map[*websocket.Conn]bool)
-var clientsMutex = sync.Mutex{}
-
-// WebSocket обновления
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+// структура для парсинга входящего JSON
+type Message struct {
+	Text string `json:"text"`
 }
 
-// Инициализация Redis
-func initRedis() {
-	redisClient = redis.NewClient(&redis.Options{
-		Addr: redisAddr,
-	})
-	_, err := redisClient.Ping(ctx).Result()
-	if err != nil {
-		log.Fatalf("Ошибка подключения к Redis: %v", err)
-	}
+// обработчик GET-запроса
+func handleGet(w http.ResponseWriter, r *http.Request) {
+	response := map[string]string{"message": "Hello from Go (GET)"}
+	json.NewEncoder(w).Encode(response)
 }
 
-// WebSocket обработчик
-func handleConnections(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Printf("Ошибка при подключении WebSocket: %v", err)
+// обработчик POST-запроса
+func handlePost(w http.ResponseWriter, r *http.Request) {
+	var msg Message
+
+	// читаем тело запроса и парсим JSON
+	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	defer ws.Close()
 
-	clientsMutex.Lock()
-	clients[ws] = true
-	clientsMutex.Unlock()
+	fmt.Printf("🟢 Received POST message: %s\n", msg.Text)
 
-	log.Println("Клиент подключился")
-
-	// Чтение сообщений от клиента
-	for {
-		var msg map[string]interface{}
-		err := ws.ReadJSON(&msg)
-		if err != nil {
-			log.Printf("Ошибка чтения WebSocket: %v", err)
-			clientsMutex.Lock()
-			delete(clients, ws)
-			clientsMutex.Unlock()
-			break
-		}
-
-		// Отправляем сообщение в Redis для Laravel
-		err = redisClient.Publish(ctx, "to-laravel-channel", msg).Err()
-		if err != nil {
-			log.Printf("Ошибка публикации в Redis: %v", err)
-		}
-	}
-}
-
-// Рассылка сообщений всем клиентам
-func broadcastMessage(message string) {
-	clientsMutex.Lock()
-	defer clientsMutex.Unlock()
-
-	for client := range clients {
-		err := client.WriteJSON(map[string]string{"message": message})
-		if err != nil {
-			log.Printf("Ошибка отправки сообщения: %v", err)
-			client.Close()
-			delete(clients, client)
-		}
-	}
-}
-
-// Подписка на канал Redis
-func subscribeToRedis() {
-	subscriber := redisClient.Subscribe(ctx, "to-go-channel")
-
-	// Обработка сообщений из Redis
-	for {
-		msg, err := subscriber.ReceiveMessage(ctx)
-		if err != nil {
-			log.Printf("Ошибка получения сообщения из Redis: %v", err)
-			continue
-		}
-
-		log.Printf("Сообщение из Redis: %s", msg.Payload)
-		broadcastMessage(msg.Payload)
-	}
+	response := map[string]string{"received": msg.Text}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 func main() {
-	// Инициализация Redis
-	initRedis()
-	defer redisClient.Close()
+	http.HandleFunc("/get", handleGet)
+	http.HandleFunc("/post", handlePost)
 
-	// Запуск подписки на Redis в отдельной горутине
-	go subscribeToRedis()
-
-	// Маршрут WebSocket
-	http.HandleFunc("/ws", handleConnections)
-
-	// Запуск HTTP-сервера
-	log.Println("WebSocket сервер запущен на :8080")
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatalf("Ошибка запуска сервера: %v", err)
-	}
+	port := ":8082"
+	fmt.Println("🚀 Go HTTP server started on http://localhost" + port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }

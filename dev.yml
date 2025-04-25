@@ -115,6 +115,7 @@ services:
       - "8082:8082"
     links:
       - redis
+    command: ["./server"]
 
 volumes:
   database:

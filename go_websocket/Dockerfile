@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine
+FROM golang:1.22-alpine
 
 WORKDIR /app
 
@@ -9,13 +9,9 @@ ENV GONOSUMDB=*
 ENV GODEBUG=netdns=go
 
 RUN [ ! -f go.mod ] && go mod init websocket || true
-
 RUN go mod tidy
-
-RUN go build -v -o server websocket-server.go
-
-RUN ls -la /app
+RUN go build -o server websocket-server.go
 
 EXPOSE 8082
 
-CMD ["./server"]
+ENTRYPOINT ["./server"]
