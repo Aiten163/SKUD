@@ -22,10 +22,13 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Установка Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+ARG HOST_UID=1000  # обычно 1000 для первого пользователя Ubuntu
+ARG HOST_GID=1000
 
+RUN usermod -u ${HOST_UID} www-data && \
+    groupmod -g ${HOST_GID} www-data
 # Копирование конфигурации PHP
 COPY ./conf.d /usr/local/etc/php/conf.d/
 
