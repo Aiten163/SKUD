@@ -29,9 +29,9 @@ class DoorActionService
             $this->lock->id = 0;
         }
 
-        if (Add_lock::first()->status && $this->lock->id==0) {
-                Lock::create(['id' => $lockId]);
-                return ['code' => 3];
+        if (Add_lock::first()->status && $this->lock->id == 0) {
+            Lock::create(['id' => $lockId]);
+            return ['code' => 3];
         }
 
         if (!$lockId || !$this->isValidAction()) {
@@ -43,13 +43,15 @@ class DoorActionService
             return ['code' => 2];
         }
         $door = $this->lock->door;
-        switch ($this->action) {
-            case 'lock':
-                return $this->lockDoor($door);
-            case 'unlock':
-                return $this->unlockDoor($door);
+        $answer = match ($this->action) {
+            'lock' => $this->lockDoor($door),
+            'unlock' => $this->unlockDoor($door)
+        };
+        if($answer == null)
+        {
+            return ['code' => 0, 'error => Action not find'];
         }
-        return ['code' => 0, 'error => Action not find'];
+        return $answer;
     }
 
     private function isValidAction(): bool
@@ -93,7 +95,7 @@ class DoorActionService
             return ['code' => 2];
         }
     }
-    public function createLog($code, $open)
+    public function createLog($code, $open): void
     {
         switch ($code) {
             case '0':

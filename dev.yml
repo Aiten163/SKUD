@@ -102,7 +102,12 @@ services:
       - "6379:6379"
     volumes:
       - redis:/data
-    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    command: [
+      "redis-server",
+      "--timeout", "0",  # Отключаем таймаут Redis
+      "--tcp-keepalive", "300",
+      "--save", "60", "1"
+    ]
 
   go-server:
     build:
