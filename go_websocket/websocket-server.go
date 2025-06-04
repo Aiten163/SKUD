@@ -12,20 +12,16 @@ import (
 )
 
 var (
-	// Redis клиент
 	redisClient *redis.Client
 
-	// WebSocket клиенты
 	clients   = make(map[*websocket.Conn]bool)
 	clientsMu sync.Mutex
 
-	// WebSocket апгрейдер
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
 )
 
-// Сообщение для передачи между клиентами и Laravel
 type Message struct {
 	Event string      `json:"event"`
 	Data  interface{} `json:"data"`
@@ -85,10 +81,27 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Получено от клиента: %+v", msg)
 
+		// Тестовая функция - отправляем ответ обратно клиенту
+		sendEchoResponse(conn, msg)
+
 		// Отправка сообщения в Redis (для Laravel)
 		if err := publishToRedis("from_go", msg); err != nil {
 			log.Printf("Ошибка публикации в Redis: %v", err)
 		}
+	}
+}
+
+// Функция для тестирования - отправляет полученное сообщение обратно клиенту
+func sendEchoResponse(conn *websocket.Conn, originalMsg Message) {
+	response := Message{
+		Event: "test_event",
+		Data:  originalMsg.Data,
+	}
+
+	if err := conn.WriteJSON(response); err != nil {
+		log.Printf("Ошибка отправки эхо-ответа: %v", err)
+	} else {
+		log.Printf("Отправлен эхо-ответ: %+v", response)
 	}
 }
 
@@ -109,6 +122,8 @@ func subscribeToRedis() {
 
 		log.Printf("Получено от Laravel: %+v", message)
 
+		// Рассылка сообщения от Laravel всем клиентам
+		broadcastToClients(message)
 	}
 }
 
