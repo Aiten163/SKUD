@@ -1,21 +1,22 @@
 FROM php:8.3-cli
 
-RUN apt-get update && apt-get install -y libmcrypt-dev mariadb-client \
-    && docker-php-ext-install pdo_mysql pcntl
+# Установка зависимостей
+RUN apt-get update && apt-get install -y \
+    libmcrypt-dev \
+    mariadb-client \
+    wget \
+    unzip \
+    curl \
+    cron \
+    && docker-php-ext-install pdo_mysql pcntl \
+    && docker-php-ext-configure exif \
+    && docker-php-ext-install exif \
+    && docker-php-ext-enable exif
 
+# Установка Composer в /usr/local/bin (без лишнего перемещения)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && chmod +x /usr/local/bin/composer
 
-
-RUN docker-php-ext-configure exif
-RUN docker-php-ext-install exif
-RUN docker-php-ext-enable exif
-
-
-RUN apt-get install -y wget unzip curl
-RUN curl -sS https://getcomposer.org/installer |php
-RUN mv composer.phar /usr/local/bin/composer
-
-RUN apt-get install -y cron
-
+# Настройка пользователя и рабочей директории
 USER 1000:1000
-
 WORKDIR /var/www

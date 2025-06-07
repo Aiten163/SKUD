@@ -31,13 +31,10 @@ func main() {
 	// Инициализация Redis
 	initRedis()
 	defer redisClient.Close()
-
 	// Запуск подписки на Redis в фоне
 	go subscribeToRedis()
-
 	// HTTP маршруты
 	http.HandleFunc("/ws", handleWebSocket)
-
 	log.Println("Сервер запущен на :8082")
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }
