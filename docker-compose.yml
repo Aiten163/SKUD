@@ -7,7 +7,7 @@ services:
           dockerfile: Dockerfile
       volumes:
           - ./:/var/www
-          - ./certs:/etc/letsencrypt
+          - /etc/letsencrypt:/etc/letsencrypt:ro
       environment:
           - "DB_PORT=3306"
           - "DB_HOST=mysql"
