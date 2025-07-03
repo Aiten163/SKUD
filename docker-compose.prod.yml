@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+    volumes:
+      - ./src:/var/www
+    environment:
+      - DB_PORT=3306
+      - DB_HOST=mysql
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php-fpm
+    command: nginx -g 'daemon off;'
+
+  php-fpm:
+    build:
+      context: ./docker/php-fpm
+    volumes:
+      - ./src:/var/www
+      - ./docker/php-fpm/prod.ini:/usr/local/etc/php/conf.d/prod.ini
+      - ~/.ssh:/root/.ssh:ro
+    environment:
+      - DB_PORT=3306
+      - DB_HOST=mysql
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+    depends_on:
+      - mysql
+      - redis
+    command: php-fpm
+
+  php-cli:
+    build:
+      context: ./docker/php-cli
+    volumes:
+      - ./src:/var/www
+    environment:
+      - DB_PORT=3306
+      - DB_HOST=mysql
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+      - COMPOSER_MEMORY_LIMIT=-1
+    depends_on:
+      - mysql
+      - redis
+    tty: true
+
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=secret
+      - MYSQL_DATABASE=laravel
+      - TZ=Europe/Moscow
+    ports:
+      - "33061:3306"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  go-server:
+    build:
+      context: ./docker/go-server
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    ports:
+      - "8082:8082"
+    command: ["./server"]
+
+volumes:
+  db_data:
+  redis_data:
