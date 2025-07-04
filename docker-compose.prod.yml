@@ -95,7 +95,7 @@ services:
       context: .
       dockerfile: docker/frp/Dockerfile  # Указываем путь к нашему Dockerfile для FRP
     volumes:
-      - ./frps.ini:docker/frp/frsc.ini  # Загружаем конфиг
+      - /home/aiten/SKUD/docker/frp/frpc.ini:/FRP/frpc.ini:rw
     ports:
       - "7000:7000"  # Порт для FRP
       - "7500:7500"  # Порт для панели управления
