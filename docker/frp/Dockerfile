@@ -1,13 +1,16 @@
-FROM alpine:latest
+# Указываем базовый образ
+FROM ubuntu:20.04
 
-# Устанавливаем зависимости
-RUN apk update && apk add --no-cache curl
+# Обновляем пакеты и устанавливаем curl и tar
+RUN apt-get update && apt-get install -y curl tar
 
-# Скачиваем FRP
+# Создаем каталог /FRP
+RUN mkdir -p /FRP
+
+# Скачиваем и распаковываем FRP
 RUN curl -sSL https://github.com/fatedier/frp/releases/download/v0.58.0/frp_0.58.0_linux_amd64.tar.gz | tar -zxvf - -C /FRP
 
 # Рабочая директория
-WORKDIR /FRP/frp_0.58.0_linux_amd64
+WORKDIR /FRP
 
-# Запускаем frps
-CMD ["./frps", "-c", "frps.ini"]
+# Остальная часть твоего Dockerfile
