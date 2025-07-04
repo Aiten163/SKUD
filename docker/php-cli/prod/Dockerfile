@@ -1,6 +1,5 @@
 FROM php:8.3-cli
 
-RUN useradd -u 1000 -g 1000 -ms /bin/bash aiten
 USER aiten
 # Устанавливаем необходимые пакеты
 RUN apt-get update && apt-get install -y \
