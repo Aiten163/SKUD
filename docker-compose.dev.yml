@@ -12,6 +12,7 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
+    restart: always
     depends_on:
       - php-fpm
       - node
@@ -21,6 +22,7 @@ services:
     build:
       context: ./docker/php-fpm
     volumes:
+      - ./.env.dev:/var/www/.env
       - ./src:/var/www
       - ./docker/php-fpm/dev.ini:/usr/local/etc/php/conf.d/dev.ini
       - ~/.ssh:/root/.ssh:ro
@@ -29,6 +31,7 @@ services:
       - DB_HOST=mysql
       - REDIS_PORT=6379
       - REDIS_HOST=redis
+    restart: always
     depends_on:
       - mysql
       - redis
@@ -36,8 +39,10 @@ services:
 
   php-cli:
     build:
-      context: ./docker/php-cli
+      context: .
+      dockerfile: docker/php-cli/dev/Dockerfile
     volumes:
+      - ./.env.dev:/var/www/.env
       - ./src:/var/www
     environment:
       - DB_PORT=3306
@@ -45,9 +50,12 @@ services:
       - REDIS_PORT=6379
       - REDIS_HOST=redis
       - COMPOSER_MEMORY_LIMIT=-1
+    restart: always
     depends_on:
       - mysql
       - redis
+    env_file:
+        - .env.dev
     tty: true
 
   mysql:
@@ -55,6 +63,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=secret
       - MYSQL_USER=user
@@ -66,6 +75,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    restart: always
     environment:
       - PMA_HOST=mysql
       - PMA_USER=user
@@ -79,6 +89,7 @@ services:
     volumes:
       - ./src:/var/www
     tty: true
+    restart: always
     command: >
       sh -c "npm install &&
              npm run dev &&
@@ -92,6 +103,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    restart: always
 
   go-server:
     build:
@@ -101,10 +113,10 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - redis
+    restart: always
     ports:
       - "8082:8082"
     command: ["./server"]
-
 volumes:
   db_data:
   redis_data:

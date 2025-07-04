@@ -12,6 +12,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    restart: always
     depends_on:
       - php-fpm
     command: nginx -g 'daemon off;'
@@ -20,6 +21,7 @@ services:
     build:
       context: ./docker/php-fpm
     volumes:
+      - ./.env.prod:/var/www/.env
       - ./src:/var/www
       - ./docker/php-fpm/prod.ini:/usr/local/etc/php/conf.d/prod.ini
       - ~/.ssh:/root/.ssh:ro
@@ -28,6 +30,7 @@ services:
       - DB_HOST=mysql
       - REDIS_PORT=6379
       - REDIS_HOST=redis
+    restart: always
     depends_on:
       - mysql
       - redis
@@ -35,8 +38,10 @@ services:
 
   php-cli:
     build:
-      context: ./docker/php-cli
+      context: .
+      dockerfile: docker/php-cli/prod/Dockerfile
     volumes:
+      - ./.env.prod:/var/www/.env
       - ./src:/var/www
     environment:
       - DB_PORT=3306
@@ -44,6 +49,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_HOST=redis
       - COMPOSER_MEMORY_LIMIT=-1
+    restart: always
     depends_on:
       - mysql
       - redis
@@ -60,6 +66,7 @@ services:
       - MYSQL_PASSWORD=secret
       - MYSQL_DATABASE=laravel
       - TZ=Europe/Moscow
+    restart: always
     ports:
       - "33061:3306"
 
@@ -67,6 +74,7 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    restart: always
     volumes:
       - redis_data:/data
 
@@ -76,6 +84,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    restart: always
     depends_on:
       - redis
     ports:
