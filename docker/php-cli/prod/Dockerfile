@@ -23,4 +23,3 @@ COPY ./src /var/www/
 
 # Запускаем composer install в правильной директории
 RUN composer install --no-interaction --prefer-dist
-COPY ./src/.env.dev /var/www/.env
