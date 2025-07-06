@@ -9,9 +9,6 @@ services:
     environment:
       - DB_PORT=3306
       - DB_HOST=mysql
-    ports:
-      - "80:80"
-      - "443:443"
     restart: always
     depends_on:
       - php-fpm
