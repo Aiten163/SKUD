@@ -113,7 +113,6 @@ services:
       - skud_network  # Используйте имя вашей основной сети
     depends_on:
       - nginx
-      - phpmyadmin
       - mysql
 volumes:
   db_data:
