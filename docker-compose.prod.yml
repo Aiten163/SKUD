@@ -115,7 +115,6 @@ services:
       - nginx
       - phpmyadmin
       - mysql
-      - node
 volumes:
   db_data:
   redis_data:
