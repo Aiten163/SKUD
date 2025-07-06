@@ -97,7 +97,14 @@ services:
       dockerfile: docker/frp/Dockerfile
     volumes:
       - ./docker/frp/frpc.ini:/etc/frp/frpc.ini:ro
-    network_mode: "host"
+    network_mode: bridge  # Измените с host на bridge
+    networks:
+      - default  # Подключите к стандартной сети
+    depends_on:
+      - nginx
+      - phpmyadmin
+      - mysql
+      - node
 volumes:
   db_data:
   redis_data:
