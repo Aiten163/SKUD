@@ -2,24 +2,27 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
-	redisClient *redis.Client
-
-	clients   = make(map[*websocket.Conn]bool)
-	clientsMu sync.Mutex
-
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
+
+	ctx = context.Background()
+)
+
+const (
+	fromGoChannel      = "from_go"      // Канал для отправки из Go в Laravel
+	fromLaravelChannel = "to_go"        // Канал для получения из Laravel в Go
 )
 
 type Message struct {
@@ -27,136 +30,119 @@ type Message struct {
 	Data  interface{} `json:"data"`
 }
 
-func main() {
-	// Инициализация Redis
-	initRedis()
-	defer redisClient.Close()
-	// Запуск подписки на Redis в фоне
-	go subscribeToRedis()
-	// HTTP маршруты
-	http.HandleFunc("/ws", handleWebSocket)
-	log.Println("Сервер запущен на :8082")
-	log.Fatal(http.ListenAndServe(":8082", nil))
+type Client struct {
+	conn *websocket.Conn
+	mu   sync.Mutex
 }
 
-// Инициализация Redis
-func initRedis() {
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     "redis:6379", // Адрес Redis (должен совпадать с Laravel)
-		Password: "",           // Пароль, если есть
-		DB:       0,            // База данных
-	})
-
-	// Проверка подключения
-	if _, err := redisClient.Ping(context.Background()).Result(); err != nil {
-		log.Fatalf("Ошибка подключения к Redis: %v", err)
-	}
+func (c *Client) send(message []byte) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.conn.WriteMessage(websocket.TextMessage, message)
 }
 
-// Обработчик WebSocket
-func handleWebSocket(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Printf("Ошибка WebSocket: %v", err)
-		return
-	}
-	defer conn.Close()
+var clients = make(map[*Client]bool)
+var clientsMu sync.Mutex
 
-	// Регистрация клиента
-	registerClient(conn)
-	defer unregisterClient(conn)
-
-	log.Println("Новый клиент подключен")
-
-	// Чтение сообщений от клиента
-	for {
-		var msg Message
-		if err := conn.ReadJSON(&msg); err != nil {
-			log.Printf("Ошибка чтения: %v", err)
-			break
-		}
-
-		log.Printf("Получено от клиента: %+v", msg)
-
-		// Тестовая функция - отправляем ответ обратно клиенту
-		sendEchoResponse(conn, msg)
-
-		// Отправка сообщения в Redis (для Laravel)
-		if err := publishToRedis("from_go", msg); err != nil {
-			log.Printf("Ошибка публикации в Redis: %v", err)
-		}
-	}
-}
-
-// Функция для тестирования - отправляет полученное сообщение обратно клиенту
-func sendEchoResponse(conn *websocket.Conn, originalMsg Message) {
-	response := Message{
-		Event: "test_event",
-		Data:  originalMsg.Data,
-	}
-
-	if err := conn.WriteJSON(response); err != nil {
-		log.Printf("Ошибка отправки эхо-ответа: %v", err)
-	} else {
-		log.Printf("Отправлен эхо-ответ: %+v", response)
-	}
-}
-
-// Подписка на Redis (для получения сообщений от Laravel)
-func subscribeToRedis() {
-	ctx := context.Background()
-	pubsub := redisClient.Subscribe(ctx, "from_laravel")
-	defer pubsub.Close()
-
-	ch := pubsub.Channel()
-
-	for msg := range ch {
-		var message Message
-		if err := json.Unmarshal([]byte(msg.Payload), &message); err != nil {
-			log.Printf("Ошибка декодирования: %v", err)
-			continue
-		}
-
-		log.Printf("Получено от Laravel: %+v", message)
-
-		// Рассылка сообщения от Laravel всем клиентам
-		broadcastToClients(message)
-	}
-}
-
-// Публикация в Redis
-func publishToRedis(channel string, msg Message) error {
-	jsonMsg, err := json.Marshal(msg)
-	if err != nil {
-		return err
-	}
-	return redisClient.Publish(context.Background(), channel, jsonMsg).Err()
-}
-
-// Рассылка сообщений всем клиентам
-func broadcastToClients(msg Message) {
+func addClient(c *Client) {
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
+	clients[c] = true
+}
 
+func removeClient(c *Client) {
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
+	delete(clients, c)
+}
+
+func broadcastToClients(message []byte) {
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
 	for client := range clients {
-		if err := client.WriteJSON(msg); err != nil {
-			log.Printf("Ошибка отправки: %v", err)
-			client.Close()
+		if err := client.send(message); err != nil {
+			log.Println("Ошибка при отправке клиенту:", err)
+			client.conn.Close()
 			delete(clients, client)
 		}
 	}
 }
 
-// Регистрация клиента
-func registerClient(conn *websocket.Conn) {
-	clientsMu.Lock()
-	clients[conn] = true
-	clientsMu.Unlock()
+func publishToRedis(rdb *redis.Client, message []byte) {
+	err := rdb.Publish(ctx, fromGoChannel, message).Err()
+	if err != nil {
+		log.Println("Ошибка при публикации в Redis:", err)
+	}
 }
 
-// Удаление клиента
-func unregisterClient(conn *websocket.Conn) {
-	clientsMu.Lock()
-	delete(clients, conn)
-	clientsMu.Unlock()
+func subscribeFromRedis(rdb *redis.Client) {
+	pubsub := rdb.Subscribe(ctx, fromLaravelChannel)
+	defer pubsub.Close()
+
+	ch := pubsub.Channel()
+
+	for msg := range ch {
+		log.Println("Получено из Redis от Laravel:", msg.Payload)
+		broadcastToClients([]byte(msg.Payload))
+	}
+}
+
+func handleWebSocket(rdb *redis.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			log.Println("Ошибка при апгрейде:", err)
+			return
+		}
+		defer conn.Close()
+
+		client := &Client{conn: conn}
+		addClient(client)
+		defer removeClient(client)
+
+		log.Println("Новый клиент подключён")
+
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				log.Println("Ошибка при чтении:", err)
+				break
+			}
+
+			log.Printf("От клиента: %s", message)
+
+			// Публикуем сообщение в Redis
+			publishToRedis(rdb, message)
+		}
+	}
+}
+
+func main() {
+	redisHost := getEnv("REDIS_HOST", "redis")
+	redisPort := getEnv("REDIS_PORT", "6379")
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
+		Password: "",
+		DB:       0,
+	})
+
+	if _, err := rdb.Ping(ctx).Result(); err != nil {
+		log.Fatal("Redis недоступен:", err)
+	}
+
+	go subscribeFromRedis(rdb)
+
+	http.HandleFunc("/ws", handleWebSocket(rdb))
+
+	port := getEnv("PORT", "8082")
+	log.Printf("Сервер запущен на :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }
