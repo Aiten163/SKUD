@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Websocket\RedisWebsocketService;
+use App\Services\Websocket\RedisConnection;
 use Illuminate\Console\Command;
 
 class ListenWebsocket extends Command
@@ -13,6 +13,6 @@ class ListenWebsocket extends Command
     public function handle()
     {
         $this->info('Listening for WebSocket messages...');
-        RedisWebsocketService::listenFromGo();
+        RedisConnection::listen();
     }
 }

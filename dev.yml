@@ -21,6 +21,7 @@ services:
   php-fpm:
     build:
       context: ./docker/php-fpm
+    user: "1000:1000"
     volumes:
       - ./.env.dev:/var/www/.env
       - ./src:/var/www
@@ -41,20 +42,15 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/dev/Dockerfile
+    user: "1000:1000"
+    working_dir: /var/www
     volumes:
-      - ./.env.dev:/var/www/.env
-      - ./src:/var/www
+      - ./src:/var/www            # Монтируем исходники
+      - .env.dev:/var/www/.env  # Монтируем .env.dev из корня проекта
     environment:
-      - DB_PORT=3306
-      - DB_HOST=mysql
-      - REDIS_PORT=6379
-      - REDIS_HOST=redis
-      - COMPOSER_MEMORY_LIMIT=-1
-    restart: always
-    depends_on:
-      - mysql
-      - redis
-    tty: true
+      - APP_ENV=local
+    restart: unless-stopped
+
 
   mysql:
     image: mysql:8.0

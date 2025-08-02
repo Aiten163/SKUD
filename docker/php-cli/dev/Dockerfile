@@ -1,39 +1,23 @@
 FROM php:8.3-cli
 
-# Устанавливаем необходимые пакеты
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
-    mariadb-client \
-    curl \
-    netcat-openbsd \
-    && docker-php-ext-install pdo_mysql pcntl exif \
-    && docker-php-ext-enable exif \
-    && apt-get clean
+    libzip-dev \
+    zip \
+    && docker-php-ext-install zip pdo pdo_mysql
 
-# Устанавливаем Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Копируем Composer из контейнера Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Создаем пользователя и директорию заранее
-RUN groupadd -g 1000 developer && \
-    useradd -u 1000 -g 1000 -ms /bin/bash developer && \
-    mkdir -p /var/www && \
-    chown developer:developer /var/www
-
-# Устанавливаем рабочую директорию
 WORKDIR /var/www
 
-# Копируем файлы проекта с правильными правами
-COPY --chown=developer:developer ./src /var/www/
+# Копируем исходники проекта
+COPY src/ /var/www/
 
-# Устанавливаем зависимости
-USER developer
-RUN composer install --no-interaction --prefer-dist
+# Копируем entrypoint скрипт
+COPY docker/php-cli/dev/entrypoint.sh /entrypoint.sh
 
-# Копируем entrypoint
-USER root
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-USER developer
+WORKDIR /var/www
+# Устанавливаем точку входа
+ENTRYPOINT ["/entrypoint.sh"]
