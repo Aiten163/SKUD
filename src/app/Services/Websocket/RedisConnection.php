@@ -11,22 +11,20 @@ class RedisConnection
 
     /**
      * Отправляет сообщение в канал
-     * @param mixed $message Сообщение (автоматически конвертируется в JSON)
      */
     public static function send($message): void
     {
-        Redis::publish(self::TO_GO, $message);
+        Redis::publish(self::TO_GO, json_encode($message));
     }
 
     /**
-     * Слушает канал и вызывает callback при получении сообщения
-     * @param callable $callback Функция обработки (получает decoded message)
+     * Слушает канал
      */
-    public function listen(callable $callback): void
+    public static function listen(): void
     {
-        Redis::subscribe([$this->channel], function ($message) use ($callback) {
+        Redis::subscribe(self::FROM_GO, function ($message) {
             $data = json_decode($message, true) ?? $message;
-            $callback($data);
+            new WebsocketRouter($data);
         });
     }
 }

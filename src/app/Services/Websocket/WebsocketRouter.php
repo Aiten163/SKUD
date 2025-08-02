@@ -3,53 +3,48 @@
 namespace App\Services\Websocket;
 
 use Illuminate\Support\Facades\Log;
+use App\Services\Websocket\ActionWebsocketService;
 
 class WebsocketRouter
 {
-    private ActionWebsocketService $logicService;
+    private array $data;
+    private string $functionName;
+    private mixed $response;
 
-    // Соответствие событий методам
-    private const ALIAS_MAP = [
-        'test' => 'processTest',
-        'ping' => 'processPing',
-        'user_connect' => 'processUserConnection'
-    ];
-
-    public function __construct()
+    public function __construct(array $msgWebsocket)
     {
-        $this->logicService = new ActionWebsocketService();
-    }
-
-    /**
-     * Выбор обработчика по событию
-     */
-    public function handleEvent(array $data): ?array
-    {
-        $event = $data['event'] ?? '';
-        $method = self::ALIAS_MAP[$event] ?? null;
-
-        if (!$method || !method_exists($this->logicService, $method)) {
-            Log::warning('Unknown event or method', ['event' => $event]);
-            return null;
-        }
+        $this->functionName = $msgWebsocket['event'] ?? '';
+        $this->data = $msgWebsocket['data'] ?? [];
 
         try {
-            return $this->logicService->$method($data['data'] ?? []);
-        } catch (\Exception $e) {
-            Log::error("Handler failed for {$event}: " . $e->getMessage());
-            return null;
+            if ($this->functionName === '')
+                throw new \Exception("Method not written");
+
+            $response = call_user_func(['ActionWebsocketService', $this->functionName], $this->data);
+
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage() . print_r($msgWebsocket, true));
+            $response = $e->getMessage();
+        }
+        if ($msgWebsocket['return_response'] === true)
+        {
+            $this->returnResponse($response);
         }
     }
 
-    /**
-     * Запуск подписки на события
-     */
-    public function startListening(): void
+    public function returnResponse(): void
     {
-        RedisConnection::listen(function (array $data) {
-            if ($response = $this->handleEvent($data)) {
-                RedisConnection::sendToGo($response);
-            }
-        });
+        try {
+            $response = [
+                'event' => $this->data['event'] ?? 'response',
+                'data' => $this->,
+                'timestamp' => now()->toDateTimeString()
+            ];
+
+            RedisConnection::send($response);
+        } catch (\Exception $e) {
+            Log::error('Failed to return answer to Go: ' . $e->getMessage());
+        }
     }
+
 }
