@@ -1,23 +1,27 @@
 FROM php:8.3-cli
 
+# Установка зависимостей
 RUN apt-get update && apt-get install -y \
-    unzip \
-    git \
-    libzip-dev \
-    zip \
-    && docker-php-ext-install zip pdo pdo_mysql
+    git curl libpng-dev libonig-dev libxml2-dev \
+    zip unzip libzip-dev libpq-dev libicu-dev \
+    iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
 
-# Копируем Composer из контейнера Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Расширения PHP
+RUN docker-php-ext-install \
+    pdo pdo_mysql pdo_pgsql mbstring exif \
+    pcntl bcmath gd zip intl sockets
+
+# Redis
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Копируем исходники проекта
-COPY src/ /var/www/
+COPY ./docker/php-cli/dev/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
 
-# Копируем entrypoint скрипт
-COPY docker/php-cli/dev/entrypoint.sh /entrypoint.sh
-
-WORKDIR /var/www
-# Устанавливаем точку входа
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["entrypoint"]
+CMD ["php", "artisan", "websocket:listen"]

@@ -7,37 +7,44 @@ use App\Services\Websocket\ActionWebsocketService;
 
 class WebsocketRouter
 {
-    private array $data;
+    private array $dataFromClient;
     private string $functionName;
-    private mixed $response;
+    private bool $return_answer;
 
     public function __construct(array $msgWebsocket)
     {
         $this->functionName = $msgWebsocket['event'] ?? '';
-        $this->data = $msgWebsocket['data'] ?? [];
+        $this->dataFromClient = $msgWebsocket['data'] ?? [];
+        $this->return_answer = $msgWebsocket['return_answer'] ?? false;
 
+        $this->findFunction();
+
+    }
+
+    private function findFunction()
+    {
         try {
             if ($this->functionName === '')
                 throw new \Exception("Method not written");
 
-            $response = call_user_func(['ActionWebsocketService', $this->functionName], $this->data);
+            $dataFromServer = 3;//app(ActionWebsocketService::class)->{$this->functionName}($this->dataFromClient);
 
         } catch (\Throwable $e) {
-            Log::error($e->getMessage() . print_r($msgWebsocket, true));
-            $response = $e->getMessage();
+            Log::error($e->getMessage() . print_r([$this->functionName, $this->dataFromClient], true));
+            $dataFromServer = $e->getMessage();
         }
-        if ($msgWebsocket['return_response'] === true)
-        {
-            $this->returnResponse($response);
+
+        if ($this->return_answer === true) {
+            $this->returnResponse($dataFromServer);
         }
     }
 
-    public function returnResponse(): void
+    public function returnResponse($data): void
     {
         try {
             $response = [
-                'event' => $this->data['event'] ?? 'response',
-                'data' => $this->,
+                'event' => $this->functionName,
+                'data' => $data ?? 'Data is null',
                 'timestamp' => now()->toDateTimeString()
             ];
 

@@ -16,6 +16,10 @@
     "field2": "value2"
 }</textarea>
                     </div>
+                    <div class="mb-3">
+                        Вернуть ли ответ? (return_answer)
+                        <input id="return_answer" class="form-check-input" checked type="checkbox">
+                    </div>
                     <button id="sendEventButton" class="btn btn-primary" onclick="sendEvent()">Отправить событие</button>
                 </div>
             </div>
@@ -34,10 +38,17 @@
     </div>
 </div>
 
-Инструкция
+<h2>Инструкция </h2>
+<h4>Формат отправленных данных:</h4>
+<ul class="list-group">
+    <li class="list-group-item">event: - string</li>
+    <li class="list-group-item">data: - array</li>
+    <li class="list-group-item">return_answer: - bool</li>
+</ul>
+<b>return_answer</b>  - True/False вернуть ли ответ, в основном для дебага
 
 <script>
-    const socketUrl = "ws://localhost:8082/ws"; // Замените на нужный адрес, если другой
+    const socketUrl = "ws://localhost:8082/ws";
     let socket;
 
     const statusElement = document.getElementById("connectionStatus");
@@ -65,7 +76,7 @@
         socket.onclose = () => {
             statusElement.className = "alert alert-warning";
             statusElement.textContent = "Соединение закрыто. Повторная попытка через 3 секунды...";
-            setTimeout(connectWebSocket, 3000); // Автоматическая переподключение
+            setTimeout(connectWebSocket, 3000);
         };
 
         socket.onerror = (error) => {
@@ -76,18 +87,21 @@
     function sendEvent() {
         const event = document.getElementById("event").value;
         const dataText = document.getElementById("data").value;
+        const return_answer = document.getElementById('return_answer').value === 'on' ? 'True' : 'False';
+
 
         let dataObj;
         try {
             dataObj = JSON.parse(dataText);
         } catch (e) {
-            alert("Неверный JSON формат в данных события!");
+            alert("Неверный JSON формат в данных события!(возможно лишняя запятая)");
             return;
         }
 
         const payload = JSON.stringify({
             event: event,
-            data: dataObj
+            data: dataObj,
+            return_answer: return_answer
         });
 
         if (socket.readyState === WebSocket.OPEN) {
@@ -99,6 +113,5 @@
         }
     }
 
-    // Инициализация соединения при загрузке
     window.addEventListener("load", connectWebSocket);
 </script>

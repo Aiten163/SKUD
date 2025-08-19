@@ -7,16 +7,12 @@ use Illuminate\Support\Facades\Log;
 class ActionWebsocketService
 {
 
-    public function test(): void
+    public static function test(): array
     {
-        $this->data = [
-            'event' => 'test_response',
-            'data' => [
-                'message' => 'msg from laravel',
-                'status' => 'success'
-            ]
+        Log::info(message: 'msg from laravel');
+        return [
+            'message' => 'msg from laravel',
+            'status' => 'success'
         ];
-        $this->answer = $this->data;
-        $this->returnAnswer();
     }
 }

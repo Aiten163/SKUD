@@ -1,14 +1,18 @@
 #!/bin/bash
+set -e
 
-echo "👉 Установка зависимостей"
-composer install --no-interaction --prefer-dist --optimize-autoloader
+    composer install --no-interaction --optimize-autoloader
 
-echo "✅ Composer install завершён"
+    # Очистка кэша (пропускаем ошибки)
+    php artisan cache:clear || true
+    php artisan config:clear || true
+    php artisan view:clear || true
 
+    # Миграции и сиды
+    php artisan migrate --force --no-interaction
+    php artisan db:seed --class=CreateAdminSeeder --force --no-interaction
 
-echo "🛠️ Artisan команды"
-php artisan migrate --force
-php artisan db:seed --class=CreateAdminSeeder --force
+    # Повторная очистка кэша после миграций
+    php artisan cache:clear
 
-echo "🚀 Запуск websocket:listen"
-exec php artisan websocket:listen
+exec "$@"

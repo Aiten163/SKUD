@@ -142,7 +142,21 @@ return [
     */
 
     'redis' => [
-
+        'publish' => [
+            'host' => env('REDIS_HOST', 'redis'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => 0,
+            'read_write_timeout' => 0,
+            'persistent' => true,
+        ],
+        'subscribe' => [
+            'host' => env('REDIS_HOST', 'redis'),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => 0,
+            'timeout' => 0,
+            'read_write_timeout' => -1
+        ],
         'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
