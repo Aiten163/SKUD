@@ -3,7 +3,7 @@ FROM php:8.3-cli
 # Создаем группу и пользователя
 RUN groupadd -g 1000 aiten && \
     useradd -u 1000 -g 1000 -ms /bin/bash aiten
-
+RUN mask 0000
 # Устанавливаем необходимые пакеты
 RUN apt-get update && apt-get install -y \
     unzip \

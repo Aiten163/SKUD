@@ -5,7 +5,6 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "pusher/pusher-php-server": "^7.0",
         "php": "^8.2",
         "laravel/framework": "^11.9",
         "laravel/reverb": "^1.0",
@@ -14,7 +13,10 @@
         "laravel/tinker": "^2.9",
         "orchid/icons": "*",
         "orchid/platform": "^14.39",
-        "predis/predis": "^2.3"
+        "php-amqplib/php-amqplib": "^3.7",
+        "predis/predis": "^2.3",
+        "pusher/pusher-php-server": "^7.0",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.4"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.2",

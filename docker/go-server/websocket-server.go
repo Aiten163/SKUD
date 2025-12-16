@@ -1,33 +1,23 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/redis/go-redis/v9"
+	"github.com/rabbitmq/amqp091-go"
 )
 
-var (
-	upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool { return true },
-	}
-
-	ctx = context.Background()
-)
-
-const (
-	fromGoChannel      = "from_go"      // Канал для отправки из Go в Laravel
-	fromLaravelChannel = "to_go"        // Канал для получения из Laravel в Go
-)
-
-type Message struct {
-	Event string      `json:"event"`
-	Data  interface{} `json:"data"`
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
 type Client struct {
@@ -35,114 +25,172 @@ type Client struct {
 	mu   sync.Mutex
 }
 
-func (c *Client) send(message []byte) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.conn.WriteMessage(websocket.TextMessage, message)
+type Message struct {
+	Event string      `json:"event"`
+	Data  interface{} `json:"data"`
 }
 
-var clients = make(map[*Client]bool)
-var clientsMu sync.Mutex
+type Server struct {
+	clients   map[*Client]bool
+	clientsMu sync.RWMutex
 
-func addClient(c *Client) {
-	clientsMu.Lock()
-	defer clientsMu.Unlock()
-	clients[c] = true
+	amqpConn *amqp091.Connection
+	amqpChan *amqp091.Channel
+	queue    amqp091.Queue
 }
 
-func removeClient(c *Client) {
-	clientsMu.Lock()
-	defer clientsMu.Unlock()
-	delete(clients, c)
-}
+func NewServer() *Server {
+	rabbitURL := "amqp://guest:guest@rabbitmq:5672/"
 
-func broadcastToClients(message []byte) {
-	clientsMu.Lock()
-	defer clientsMu.Unlock()
-	for client := range clients {
-		if err := client.send(message); err != nil {
-			log.Println("Ошибка при отправке клиенту:", err)
-			client.conn.Close()
-			delete(clients, client)
-		}
-	}
-}
-
-func publishToRedis(rdb *redis.Client, message []byte) {
-	err := rdb.Publish(ctx, fromGoChannel, message).Err()
+	conn, err := amqp091.Dial(rabbitURL)
 	if err != nil {
-		log.Println("Ошибка при публикации в Redis:", err)
+		log.Fatal("Ошибка подключения к RabbitMQ:", err)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Fatal("Ошибка открытия канала RabbitMQ:", err)
+	}
+
+	q, err := ch.QueueDeclare(
+		"ws_messages",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatal("Ошибка объявления очереди:", err)
+	}
+
+	log.Println("Подключение к RabbitMQ установлено")
+
+	return &Server{
+		clients:  make(map[*Client]bool),
+		amqpConn: conn,
+		amqpChan: ch,
+		queue:    q,
 	}
 }
 
-func subscribeFromRedis(rdb *redis.Client) {
-	pubsub := rdb.Subscribe(ctx, fromLaravelChannel)
-	defer pubsub.Close()
-
-	ch := pubsub.Channel()
-
-	for msg := range ch {
-		log.Println("Получено из Redis от Laravel:", msg.Payload)
-		broadcastToClients([]byte(msg.Payload))
-	}
+func (s *Server) publishToRabbitMQ(body []byte) error {
+	return s.amqpChan.Publish(
+		"",
+		s.queue.Name,
+		false,
+		false,
+		amqp091.Publishing{
+			ContentType: "application/json",
+			Body:        body,
+			Timestamp:   time.Now(),
+		},
+	)
 }
 
-func handleWebSocket(rdb *redis.Client) http.HandlerFunc {
+func (s *Server) handleWebSocket() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Новое WebSocket соединение")
+
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println("Ошибка при апгрейде:", err)
+			log.Println("Ошибка апгрейда:", err)
 			return
 		}
-		defer conn.Close()
 
 		client := &Client{conn: conn}
-		addClient(client)
-		defer removeClient(client)
 
-		log.Println("Новый клиент подключён")
+		s.clientsMu.Lock()
+		s.clients[client] = true
+		clientCount := len(s.clients)
+		s.clientsMu.Unlock()
+
+		defer func() {
+			s.clientsMu.Lock()
+			delete(s.clients, client)
+			s.clientsMu.Unlock()
+			conn.Close()
+			log.Println("WebSocket соединение закрыто")
+		}()
+
+		welcome := Message{
+			Event: "connected",
+			Data: map[string]interface{}{
+				"clients":   clientCount,
+				"timestamp": time.Now().Unix(),
+			},
+		}
+
+		welcomeBytes, _ := json.Marshal(welcome)
+		client.mu.Lock()
+		conn.WriteMessage(websocket.TextMessage, welcomeBytes)
+		client.mu.Unlock()
 
 		for {
-			_, message, err := conn.ReadMessage()
+			msgType, msg, err := conn.ReadMessage()
 			if err != nil {
-				log.Println("Ошибка при чтении:", err)
-				break
+				log.Println("Ошибка чтения:", err)
+				return
 			}
 
-			log.Printf("От клиента: %s", message)
+			if msgType != websocket.TextMessage {
+				continue
+			}
 
-			// Публикуем сообщение в Redis
-			publishToRedis(rdb, message)
+			log.Printf("Сообщение от клиента: %s", string(msg))
+
+			// 👉 отправка в RabbitMQ
+			if err := s.publishToRabbitMQ(msg); err != nil {
+				log.Println("Ошибка RabbitMQ:", err)
+			}
+
+			// echo-ответ
+			echo := Message{
+				Event: "echo",
+				Data: map[string]interface{}{
+					"message":   string(msg),
+					"timestamp": time.Now().Unix(),
+				},
+			}
+
+			echoBytes, _ := json.Marshal(echo)
+			client.mu.Lock()
+			conn.WriteMessage(websocket.TextMessage, echoBytes)
+			client.mu.Unlock()
 		}
+	}
+}
+
+func (s *Server) handleHealth() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.clientsMu.RLock()
+		count := len(s.clients)
+		s.clientsMu.RUnlock()
+
+		resp := map[string]interface{}{
+			"status":  "ok",
+			"clients": count,
+			"time":    time.Now().Unix(),
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
 	}
 }
 
 func main() {
-	redisHost := getEnv("REDIS_HOST", "redis")
-	redisPort := getEnv("REDIS_PORT", "6379")
+	server := NewServer()
+	defer server.amqpChan.Close()
+	defer server.amqpConn.Close()
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
-		Password: "",
-		DB:       0,
+	http.HandleFunc("/ws", server.handleWebSocket())
+	http.HandleFunc("/health", server.handleHealth())
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "WebSocket server is running")
 	})
 
-	if _, err := rdb.Ping(ctx).Result(); err != nil {
-		log.Fatal("Redis недоступен:", err)
-	}
+	port := "8082"
+	log.Println("Сервер запущен на порту", port)
 
-	go subscribeFromRedis(rdb)
-
-	http.HandleFunc("/ws", handleWebSocket(rdb))
-
-	port := getEnv("PORT", "8082")
-	log.Printf("Сервер запущен на :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-}
-
-func getEnv(key, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
 }

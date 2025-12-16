@@ -9,6 +9,7 @@ services:
     environment:
       - DB_PORT=3306
       - DB_HOST=mysql
+      - RABBITMQ_HOST=rabbitmq
     ports:
       - "80:80"
       - "8080:8080"
@@ -21,7 +22,7 @@ services:
   php-fpm:
     build:
       context: ./docker/php-fpm
-    user: "${UID:-1002}:${GID:-1002}"
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./.env.dev:/var/www/.env
       - ./src:/var/www
@@ -32,17 +33,22 @@ services:
       - DB_HOST=mysql
       - REDIS_PORT=6379
       - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
     restart: always
     depends_on:
       - mysql
       - redis
+      - rabbitmq
     command: php-fpm
 
   php-cli:
     build:
       context: .
       dockerfile: docker/php-cli/dev/Dockerfile
-    user: "${UID:-1002}:${GID:-1002}"
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./src:/var/www
       - ./.env.dev:/var/www/.env
@@ -50,12 +56,16 @@ services:
       - DB_HOST=mysql
       - MYSQL_USER=user
       - MYSQL_PASSWORD=secret
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
     restart: unless-stopped
     depends_on:
       mysql:
         condition: service_started
       redis:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   mysql:
     image: mysql:8.0
@@ -108,14 +118,47 @@ services:
     build:
       context: ./docker/go-server
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VHOST=/
+      - USE_RABBITMQ=true
+      - USE_REDIS=false
+      - PORT=8082
     depends_on:
-      - redis
-    restart: always
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
     ports:
       - "8082:8082"
-    command: ["./server"]
+    command: [ "./server" ]
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "5672:5672"   # AMQP protocol port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   db_data:
   redis_data:
+  rabbitmq_data:

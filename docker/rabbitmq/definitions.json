@@ -1,0 +1,68 @@
+{
+  "users": [
+    {
+      "name": "guest",
+      "password": "guest",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "websocket_exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "to_go_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "from_go_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "websocket_exchange",
+      "vhost": "/",
+      "destination": "to_go_queue",
+      "destination_type": "queue",
+      "routing_key": "to_go",
+      "arguments": {}
+    },
+    {
+      "source": "websocket_exchange",
+      "vhost": "/",
+      "destination": "from_go_queue",
+      "destination_type": "queue",
+      "routing_key": "from_go",
+      "arguments": {}
+    }
+  ]
+}

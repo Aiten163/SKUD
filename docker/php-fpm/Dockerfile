@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Создаём группу project и добавляем www-data
-RUN groupadd -g 888 skud || true \
+RUN groupadd -g 1000 skud || true \
     && usermod -aG skud www-data
 
 # Копируем конфиг и entrypoint
